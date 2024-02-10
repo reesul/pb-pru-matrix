@@ -1,9 +1,30 @@
-<mxfile host="app.diagrams.net" modified="2024-02-10T20:59:36.940Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0" version="23.1.2" etag="O6uFxqBrhtRtAM2oNBsg" type="github">
-  <diagram name="Page-1" id="h8k_vWh1ZM-dHhhZRbbF">
-    <mxGraphModel>
+<mxfile host="app.diagrams.net" modified="2024-02-10T21:02:05.145Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0" etag="j5Gy7pk-Im_3zUSNxhb1" version="23.1.2" type="github">
+  <diagram name="Send-new-image" id="h8k_vWh1ZM-dHhhZRbbF">
+    <mxGraphModel dx="807" dy="537" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="1PWPphEqJAE052H-eO9x-1" value="A7" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="1PWPphEqJAE052H-eO9x-2" value="PRU0" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="370" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="1PWPphEqJAE052H-eO9x-4" value="PRU shared mem&lt;br&gt;&lt;div&gt;12kb&lt;/div&gt;" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="551" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="1PWPphEqJAE052H-eO9x-5" value="PRU mem 0 &lt;br&gt;(8kb)" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="700" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="1PWPphEqJAE052H-eO9x-7" value="PRU mem 1&lt;br&gt;(8kb)" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="850" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="1PWPphEqJAE052H-eO9x-9" value="" style="endArrow=none;dashed=1;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="300" y="788" as="sourcePoint" />
+            <mxPoint x="300" y="30" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
