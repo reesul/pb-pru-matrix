@@ -139,10 +139,10 @@ typedef struct matrix_img {
 #define DELAY_CYCLES_100MS (20000000)
 #define DELAY_CYCLES_1S (200000000)
 
-#define MAX_COLOR_BITS (8u)
-#define COLOR_BITS (7u)
+#define MAX_COLOR_BITS (8)
+#define COLOR_BITS (8)
 #define UNUSED_COLOR_BITS ( MAX_COLOR_BITS - COLOR_BITS )
-#define DELAY_NS_PER_BIT 50 // MSb at 10k was good for 1b depth, so 10*256 = 2,560 is probably okay. Total would be ~5120 ns = 5us per row. 10 is good starting value
+#define DELAY_NS_PER_BIT 10 // MSb at 10k was good for 1b depth, so 10*256 = 2,560 is probably okay. Total would be ~5120 ns = 5us per row. 10 is good starting value
 
 void toggle_user_led_3_1ms(int n)
 {
@@ -201,7 +201,7 @@ static inline void clear_pru_bits(uint32_t data)
     __R30 &= ~data;
 }
 
-const uint32_t CLEAR_COLOR_BITS_l = 1 << PRU_R1 | 1 << PRU_G1 | 1  << PRU_B1 | 1 << PRU_R2 | 1 << PRU_G2 | 1 <<PRU_B2;
+const uint32_t CLEAR_COLOR_BITS = 1 << PRU_R1 | 1 << PRU_G1 | 1  << PRU_B1 | 1 << PRU_R2 | 1 << PRU_G2 | 1 <<PRU_B2;
 
 void write_row_pins(uint32_t* gpio_bank, uint8_t row) 
 {
@@ -217,43 +217,46 @@ void write_row_pins(uint32_t* gpio_bank, uint8_t row)
 
 }
 
+/**
+ * R1,G1, etc. are all boolean values (should be LSB bit only... not checking again in time critical code)
+*/
 void write_color_bits(uint8_t r1, uint8_t g1, uint8_t b1, \
         uint8_t r2, uint8_t g2, uint8_t b2)
 {
     uint32_t color_bits = r1 << PRU_R1 | g1 << PRU_G1 | b1  << PRU_B1 |
         r2 << PRU_R2 | g2 << PRU_G2 | b2 <<PRU_B2;
 
-    clear_pru_bits(CLEAR_COLOR_BITS_l); //make sure they are all in off state by default. No state from last iteration.
-    __delay_cycles(10);    
+    clear_pru_bits(CLEAR_COLOR_BITS); //make sure they are all in off state by default. No state from last iteration.
+
+	/**Corect timing*/
+	//ensure CLK is down
     clear_pru_bits(CLK_BIT);
-    __delay_cycles(10);
-
-
+    __delay_cycles(2);
+	//set color signals
     set_pru_bits(color_bits);
-    __delay_cycles(10);
-
+    __delay_cycles(5);
+	//rising clock
     set_pru_bits(CLK_BIT);
-    __delay_cycles(10);
-
+    __delay_cycles(5);
+	//falling clock; color bits latch at this point
     clear_pru_bits(CLK_BIT);
 
-	__delay_cycles(10);
-
+	__delay_cycles(2);
    
-    clear_pru_bits(CLEAR_COLOR_BITS_l); //added for matrix funkiness
+    clear_pru_bits(CLEAR_COLOR_BITS); //added for matrix funkiness
 }
 
 void latch_and_enable(uint32_t* gpio_ports[4], uint32_t delay_ns)
 {
     gpio_ports[GPIO_PORT_LATCH][GPIO_SETDATAOUT] = LATCH_BIT;
     gpio_ports[GPIO_PORT_OE][GPIO_SETDATAOUT] = OE_BIT;
-    __delay_cycles(10);
+    __delay_cycles(500); //5 cycles is sufficient
 
     gpio_ports[GPIO_PORT_LATCH][GPIO_CLEARDATAOUT] = LATCH_BIT;
-    __delay_cycles(10);
+    __delay_cycles(500);
 
     gpio_ports[GPIO_PORT_OE][GPIO_CLEARDATAOUT] = OE_BIT;
-    __delay_cycles(10);
+    __delay_cycles(500);
 
     //200 MHz -> 5ns/cycle
 	// toggle_user_led_3_100ms(1);
@@ -270,19 +273,15 @@ void display_row(uint32_t delay_ns, uint8_t row_counter, uint8_t bit, \
         char* red_row1, char* green_row1, char* blue_row1, \
         char* red_row2, char* green_row2, char* blue_row2)
 {
-    uint8_t r1=0xff, g1=0xff, b1=0xff, r2=0xff, g2=0xff, b2=0xff;
     uint32_t* ports[4] = {(uint32_t *)GPIO0, (uint32_t *)GPIO1, (uint32_t *)GPIO2, (uint32_t *)GPIO3};
+    // uint8_t r1=0xff, g1=0xff, b1=0xff, r2=0xff, g2=0xff, b2=0xff;
+    uint8_t r1, g1, b1, r2, g2, b2;
 
     write_row_pins(ports[GPIO_PORT_A], row_counter);
 	// toggle_user_led_3_100ms(row_counter);
 
     int32_t col = N_COL-1;
-	uint8_t bitmask = 1 << bit;
-	// uint8_t bitmask = 0xff;
-
-	// __delay_cycles(DELAY_CYCLES_1S); 
-	// toggle_user_led_3_100ms(3);
-
+	// bit = (bit <= 0 || bit > 7) ? 7 : bit;// clamp to 7 if not inside range
     for ( ; col >= 0; col--)
     {
 		// for each pixel, isolate the current bit
@@ -316,16 +315,10 @@ void main(void)
 	__delay_cycles(DELAY_CYCLES_1S); 
 	toggle_user_led_3_100ms(1);
 
-	int8_t bit = 7; //highest bit for now 
+	int16_t bit = 7; //highest bit for now 
 	uint8_t row_counter = 15;
-	uint32_t delay_ns_high_bit = 1000 * 10; //5ms is ok; 10us shows 'static' image
+	// uint32_t delay_ns_high_bit = 1000 * 10; //5ms is ok; 10us shows 'static' image
 
-	uint32_t *gpio0 = (uint32_t *)GPIO0;
-    uint32_t *gpio1 = (uint32_t *)GPIO1;
-    uint32_t *gpio2 = (uint32_t *)GPIO2;
-    uint32_t *gpio3 = (uint32_t *)GPIO3;
-
-    uint32_t* ports[4] = {gpio0, gpio1, gpio2, gpio3};
  
 	while (1) {
 		// __delay_cycles(DELAY_CYCLES_1S); 
@@ -343,7 +336,7 @@ void main(void)
 
 		for (bit = MAX_COLOR_BITS-1; bit >= UNUSED_COLOR_BITS; bit--)
 		{
-			// toggle_user_led_3_100ms(bit);
+	
 			uint32_t delay_duration_ns = DELAY_NS_PER_BIT << bit;
 			for (row_counter = 0; row_counter < N_ROW/2; row_counter++)
 			{
@@ -355,14 +348,15 @@ void main(void)
 					active_image.mat[GREEN_CHAN][row_counter+N_ROW/2], \
 					active_image.mat[BLUE_CHAN][row_counter+N_ROW/2] );
 
+
 			}
+			// toggle_user_led_3_100ms(bit+1);
 			// __delay_cycles(DELAY_CYCLES_1S); 
 		}
 		// __delay_cycles(DELAY_CYCLES_1S); 
-		// toggle_user_led_3_100ms(10);
+		// toggle_user_led_3_100ms(20);
 		// __delay_cycles(DELAY_CYCLES_1S); 
 
 	}
-		
 
 }

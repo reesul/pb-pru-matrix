@@ -19,7 +19,7 @@ PRU_SHARED_MEM_HASH_LOC = PRU_ADDR + PRU_SHAREDMEM
 PRU_SHARED_MEM_IMAGE_LOC = PRU_ADDR + PRU_SHAREDMEM + 16
 IMAGE_OFFSET = 16 + 0
 
-FPS_TARGET=60
+FPS_TARGET=15 # 24 #30 # 60
 INTERFRAME_LATENCY = 1/FPS_TARGET
 
 # fo = open("/dev/rpmsg_pru30", "wb", 0)
@@ -29,82 +29,6 @@ fmem = os.open('/dev/mem', os.O_RDWR | os.O_SYNC )
 print('Opened')
 pru_shared_mem = mmap.mmap(fmem, PRU_SHAREDMEM_SIZE, offset=PRU_ADDR+PRU_SHAREDMEM)
 print("mapped PRU memory")
-
-def gen_test_image(shape=[3,32,64], rowswapper=0):
-    image = np.zeros(shape, dtype=np.uint8)
-
-    RED_IND = 0
-    GREEN_IND = 1
-    BLUE_IND = 2
-    
-    print(image.shape)
-    for row in range(image.shape[1]):
-        if (row+rowswapper) % 4 ==  0:
-            # image[RED_IND,row,:] = 0xff
-            # image[GREEN_IND,row,:] = 0
-            # image[BLUE_IND,row,:] = 0xff
-            image[RED_IND,row,:] = 0xff
-            image[GREEN_IND,row,:] = 0
-            image[BLUE_IND,row,:] = 0
-            # image[GREEN_IND,row,:32] = 0xff
-            # image[BLUE_IND,row,:32] = 0
-            
-        if (row+rowswapper) % 4 ==  1:
-            # image[RED_IND,row,:] = 0x0
-            # image[GREEN_IND,row,:] = 0
-            # image[BLUE_IND,row,:] = 0xff
-            image[RED_IND,row,:] = 0x0
-            image[GREEN_IND,row,:] = 0
-            image[BLUE_IND,row,:] = 0xff
-            # image[RED_IND,row,:32] = 0xff
-            # image[RED_IND,row,32:] = 0
-            # image[GREEN_IND,row,:] = 0xff
-            # image[BLUE_IND,row,32:] = 0xff
-            # image[BLUE_IND,row,:32] = 0
-
-        if (row+rowswapper) % 4 ==  2:
-            # image[RED_IND,row,:] = 0x0
-            # image[GREEN_IND,row,:] = 0xff
-            # image[BLUE_IND,row,:] = 0xff
-            image[RED_IND,row,:] = 0x0
-            image[GREEN_IND,row,:] = 0xff
-            image[BLUE_IND,row,:] = 0x0
-            # image[RED_IND,row,:16] = 0xff
-            # image[RED_IND,row,16:] = 0
-            # image[GREEN_IND,row,:16] = 0x0
-            # image[GREEN_IND,row,16:] = 0xff
-            # image[BLUE_IND,row,:] = 0xff
-        
-        if (row+rowswapper) % 4 ==  3:
-            # image[RED_IND,row,ac] = 0xff
-            # image[GREEN_IND,row,:] = 0xff
-            # image[BLUE_IND,row,:] = 0x0
-            image[RED_IND,row,:] = 0xff
-            image[GREEN_IND,row,:] = 0xff
-            image[BLUE_IND,row,:] = 0xff
-
-
-    return image
-
-def gen_test_image_column(shape=[3,32,64], rowswapper=0, active_col=0):
-    image = np.zeros(shape, dtype=np.uint8)
-
-    RED_IND = 0
-    GREEN_IND = 1
-    BLUE_IND = 2
-    
-    print(image.shape)
-    for row in range(image.shape[1]):
-        
-        # image[RED_IND,row,ac] = 0xff
-        # image[GREEN_IND,row,:] = 0xff
-        # image[BLUE_IND,row,:] = 0x0
-        image[RED_IND,row,active_col] = 0xff
-        # image[GREEN_IND,row,active_col] = 0xff
-        # image[BLUE_IND,row,active_col] = 0xff
-
-
-    return image
 
 def read_test_image_file(filepath='Test_card.png'):
     image = cv2.imread(filepath)
@@ -141,18 +65,13 @@ def transform_test_image_colorbits(image, cols=64, bits=8):
 
     col_bit_counter = 0
     for j in range(cols):
-        print(f'col bit counter {col_bit_counter}')
         col = image[:,:,j]
-        print(col)
         bitmask = ( (2**8 - 1) )
-        print('bitmask %s' % hex(bitmask))
         bitmask = bitmask >> (col_bit_counter)
-        print('reduced bitmask %s' % hex(bitmask))
 
         new_col = col & bitmask
         col_bit_counter = ( col_bit_counter + 1 ) % bits
 
-        print(new_col)
         image[:,:,j] = new_col
 
     return image
@@ -188,17 +107,17 @@ test_image = test_image_base.copy()
 for i in range(NUM_ITER):
     print('send')
     
-    # test_image = gen_test_image_column(rowswapper=0, active_col=i%64)
 
     test_image = shift_cols(test_image)
 
-    #start from static image each time
+    ###start from static image each time
     # test_image = test_image_base.copy()
-    #traveling pixel up the side
+    
+    ###traveling pixel up the side
     # test_image[0,i%32,0] = 0xff
     # test_image[2,i%32,63] = 0xff
 
-    #static pixel for localizing
+    ###static pixel for localizing
     # test_image[2,1,1] = 255
     # test_image[2,16,32] = 255
     #test_image[2,27:30,:] = 255
@@ -213,7 +132,7 @@ for i in range(NUM_ITER):
     pru_shared_mem.write(test_image.tobytes())
 
     #fo.write(bytes([i]));
-    print('sleep...')
+    # print('sleep...')
     t2=time()
     t_sleep = INTERFRAME_LATENCY - (t2-t1)
     if (t_sleep > 0):
