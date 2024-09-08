@@ -12,14 +12,18 @@ import cv2
 t2=time()
 print(f'Took {t2-t1} s to load')
 
+MD5SUM_SIZE = 16
+
 PRU_ADDR = 0x4A300000
 PRU_SHAREDMEM  = 0x10000
 PRU_SHAREDMEM_SIZE = 12000
-PRU_SHARED_MEM_HASH_LOC = PRU_ADDR + PRU_SHAREDMEM
-PRU_SHARED_MEM_IMAGE_LOC = PRU_ADDR + PRU_SHAREDMEM + 16
-IMAGE_OFFSET = 16 + 0
 
-FPS_TARGET=15 # 24 #30 # 60
+PRU_SHARED_MEM_HASH_LOC = PRU_ADDR + PRU_SHAREDMEM
+PRU_SHARED_MEM_IMAGE_LOC = PRU_ADDR + PRU_SHAREDMEM + MD5SUM_SIZE
+EXTRA_OFFSET = 0
+IMAGE_OFFSET = MD5SUM_SIZE + EXTRA_OFFSET
+
+FPS_TARGET=30 # 24 #30 # 60
 INTERFRAME_LATENCY = 1/FPS_TARGET
 
 # fo = open("/dev/rpmsg_pru30", "wb", 0)
@@ -37,7 +41,7 @@ def read_test_image_file(filepath='Test_card.png'):
     image = cv2.flip(image, 0)
     image = image.astype(np.uint8)
     print(image.shape)
-    image = cv2.resize(image, (64,32))
+    image = cv2.resize(image, (64,32), interpolation=cv2.INTER_LINEAR)
     print(image.shape)
     image = np.transpose(image, (2,0,1))#CHW from HWC
     
@@ -92,10 +96,12 @@ def shift_cols(image, cols=64):
 i=0
 
 print('Generate test image')
-# test_image_base = read_test_image_file()
-test_image_base = gen_white_image()
+test_image_base = read_test_image_file()
+# test_image_base = gen_white_image()
+# test_image_base[:2,:,:] = 0
+# test_image_base[2,:,:] = 0xff
 print('Generated.')
-test_image_base = transform_test_image_colorbits(test_image_base)
+# test_image_base = transform_test_image_colorbits(test_image_base)
 
 # sleep(5)
  
@@ -114,17 +120,15 @@ for i in range(NUM_ITER):
     # test_image = test_image_base.copy()
     
     ###traveling pixel up the side
-    # test_image[0,i%32,0] = 0xff
+    test_image[0,i%32,0] = 0x0
     # test_image[2,i%32,63] = 0xff
 
     ###static pixel for localizing
     # test_image[2,1,1] = 255
-    # test_image[2,16,32] = 255
+    # test_image[2,28,60:] = 0
     #test_image[2,27:30,:] = 255
 
     # print(test_image[:,0,:])
-
-
     md5 = hashlib.md5(test_image).digest()
     pru_shared_mem.seek(0)
     pru_shared_mem.write(md5)

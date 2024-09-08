@@ -42,6 +42,9 @@
 // #include <fcntl.h>
 //#include <sys/mman.h>
 
+// #define CHECK_IMG_INTEGRITY
+
+
 #define PRU_R1 1
 #define PRU_G1 7
 #define PRU_B1 4
@@ -118,7 +121,7 @@ volatile register uint32_t __R31;
 #define MD5_SUM_LEN_BYTES 16
 #define EXTRA_OFFSET 0
 volatile char *md5_image_host = (char*)PRU_SHAREDMEM;
-
+//set to static location in DDR, which other programs will write to using /dev/mem
 volatile char *image_base = (char*)PRU_SHAREDMEM + MD5_SUM_LEN_BYTES + EXTRA_OFFSET;
 const int img_size = N_CHAN * N_ROW * N_COL;
 
@@ -142,7 +145,7 @@ typedef struct matrix_img {
 #define MAX_COLOR_BITS (8)
 #define COLOR_BITS (8)
 #define UNUSED_COLOR_BITS ( MAX_COLOR_BITS - COLOR_BITS )
-#define DELAY_NS_PER_BIT 10 // MSb at 10k was good for 1b depth, so 10*256 = 2,560 is probably okay. Total would be ~5120 ns = 5us per row. 10 is good starting value
+#define DELAY_NS_PER_BIT 20 // MSb at 10k was good for 1b depth, so 10*256 = 2,560 is probably okay. Total would be ~5120 ns = 5us per row. 10 is good starting value
 
 void toggle_user_led_3_1ms(int n)
 {
@@ -189,6 +192,20 @@ uint8_t is_hash_same(char* local_md5, char* shared_md5)
 		}
 	}
 	return 1;
+}
+
+uint32_t sum_image_bits(matrix_img_t* img)
+{
+	int32_t sum = 0;
+	int32_t i = 0;
+	char* img_ptr = (char*) img;
+	for (; i < N_CHAN*N_COL*N_ROW ; i++)
+	{
+		sum+= img_ptr[i];
+		if ( i > 2*N_COL*N_ROW + N_COL*28 + (64-20)) break;
+		// if ( i > 128 ) break;
+	}
+	return sum;
 }
 
 static inline void set_pru_bits(uint32_t data)
@@ -293,6 +310,7 @@ void display_row(uint32_t delay_ns, uint8_t row_counter, uint8_t bit, \
         b2 = ( (blue_row2[col]) >> bit ) & 0x1;
 		
         write_color_bits(r1, g1, b1, r2, g2, b2);
+        // write_color_bits(b2, b2, b2, b2, b2, b2); // debug weird row FIXME
 		// write_color_bits(1, 1, 1, 1, 1, 1); //test case
 
     }
@@ -303,17 +321,19 @@ void display_row(uint32_t delay_ns, uint8_t row_counter, uint8_t bit, \
 /*
  * main.c
  */
+matrix_img_t active_image;
+
+
 void main(void)
 {
 	char active_md5[MD5_SUM_LEN_BYTES];
-	matrix_img_t active_image;
 	memset((void*)active_image.mat, 0xff, sizeof(active_image));
 	// char active_image[N_CHAN][N_ROW][N_ROW] = {0xff};//= (char (*)[N_CHAN][N_ROW][N_COL]) active_image;
 	//memset(active_image, 0xff, sizeof(active_image));
 	//memset(active_md5, 0, sizeof(MD5_SUM_LEN_BYTES));
 	toggle_user_led_3_100ms(1);
 	__delay_cycles(DELAY_CYCLES_1S); 
-	toggle_user_led_3_100ms(1);
+	toggle_user_led_3_100ms(2);
 
 	int16_t bit = 7; //highest bit for now 
 	uint8_t row_counter = 15;
@@ -326,12 +346,25 @@ void main(void)
 
 		if (!is_hash_same((char*)active_md5, (char*)md5_image_host) || 1)
 		{
+			
 			//__delay_cycles(DELAY_CYCLES_1S); 
 			//toggle_user_led_3_100ms(2);
 			//__delay_cycles(DELAY_CYCLES_1S); 
 			memset((void*)active_image.mat, 0, sizeof(active_image));
 			memcpy((void*)active_image.mat, (void*)image_base, img_size);
 			memcpy((void*)active_md5, (void*)md5_image_host, MD5_SUM_LEN_BYTES);
+
+#ifdef CHECK_IMG_INTEGRITY
+			int32_t sum_local, sum_shared;
+			sum_local = sum_image_bits(&active_image);
+			sum_shared = sum_image_bits((matrix_img_t*) image_base);
+
+			if (sum_local != sum_shared) 
+			{
+				__delay_cycles(DELAY_CYCLES_100MS);
+				// while(1);
+			}
+#endif
 		}
 
 		for (bit = MAX_COLOR_BITS-1; bit >= UNUSED_COLOR_BITS; bit--)
@@ -347,12 +380,15 @@ void main(void)
 					active_image.mat[RED_CHAN][row_counter+N_ROW/2], \
 					active_image.mat[GREEN_CHAN][row_counter+N_ROW/2], \
 					active_image.mat[BLUE_CHAN][row_counter+N_ROW/2] );
+					// active_image.mat[BLUE_CHAN][row_counter+N_ROW/2] );
 
 
 			}
+			//DEBUG CODE
 			// toggle_user_led_3_100ms(bit+1);
 			// __delay_cycles(DELAY_CYCLES_1S); 
 		}
+		//DEBUG CODE
 		// __delay_cycles(DELAY_CYCLES_1S); 
 		// toggle_user_led_3_100ms(20);
 		// __delay_cycles(DELAY_CYCLES_1S); 
