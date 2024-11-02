@@ -9,7 +9,11 @@
 #should be default, but confirm setting. Pin is shared with GPIO and must be configured as input
 config-pin P2_35 gpio_input
 
+#disable so we can reconfigure
+echo 0 > /sys/bus/iio/devices/iio\:device0/buffer/enable
+
 #enable AIN5 as an input; all others should be 0
+echo 0 > /sys/bus/iio/devices/iio\:device0/scan_elements/in_voltage*_en
 echo 1 > /sys/bus/iio/devices/iio\:device0/scan_elements/in_voltage5_en
 
 # Set the buffer to capture 1024 elements at a time --> 5.12 ms
