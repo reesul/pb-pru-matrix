@@ -4,12 +4,12 @@ import os, sys, time
 
 
 dev_filepath = '/dev/iio:device0'
-BUF_SIZE = 256
+BUF_SIZE = 512
 ELEMENT_SIZE = 2 #uint16 containers
 CHUNK_SIZE = BUF_SIZE * ELEMENT_SIZE
-TEST_DURATION = 15.0 #seconds
-SAMPLERATE = 7692 #calc sampling rate from ADC DTS config#8192 #guess?
-FLUSH_ITERATIONS=25
+TEST_DURATION = 35.0 #seconds
+SAMPLERATE = 40000 #calc sampling rate from ADC DTS config#8192 #guess?
+FLUSH_ITERATIONS=10
 
 buffers = []
 buffer = bytearray()
@@ -30,17 +30,15 @@ with open(dev_filepath, 'rb') as dev_file:
     t2 = time.time()
 
 print('test duration %f s' % (t2-t1))
-print(len(buffers))
+print(f'{len(buffers)} buffers of size {CHUNK_SIZE}')
+DEAD_SECONDS=0
+buffer = bytearray([0 for i in range(SAMPLERATE*2*DEAD_SECONDS)])
 for b in buffers:
     buffer.extend(b)
-print(len(buffer))
+print(f'{len(buffer)} samples')
 
-# print(buffers)
-print(len(buffer))
-
-# exit()
 with wave.open("sound1.wav", "wb") as f:
-    # 2 Channels.
+    # 1 Channel.
     f.setnchannels(1)
     # 2 bytes per sample.
     f.setsampwidth(2)

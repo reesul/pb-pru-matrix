@@ -13,11 +13,12 @@ config-pin P2_35 gpio_input
 echo 0 > /sys/bus/iio/devices/iio\:device0/buffer/enable
 
 #enable AIN5 as an input; all others should be 0
-echo 0 > /sys/bus/iio/devices/iio\:device0/scan_elements/in_voltage*_en
+# echo 0 > /sys/bus/iio/devices/iio\:device0/scan_elements/in_voltage*_en
 echo 1 > /sys/bus/iio/devices/iio\:device0/scan_elements/in_voltage5_en
 
 # Set the buffer to capture 1024 elements at a time --> 5.12 ms
-echo 1024 > /sys/bus/iio/devices/iio\:device0/buffer/length
+BUF_SIZE=2048
+echo $BUF_SIZE > /sys/bus/iio/devices/iio\:device0/buffer/length
 
 # enable the driver to capture continuously and store within buffers
 echo 1 > /sys/bus/iio/devices/iio\:device0/buffer/enable
