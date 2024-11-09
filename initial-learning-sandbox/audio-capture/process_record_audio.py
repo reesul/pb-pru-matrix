@@ -20,7 +20,7 @@ def read_samples(wave_file, num_samples):
 
 
 def run_fft_test(wavefile_name='sound1.wav', chunk_size=CHUNK_SIZE, use_real_fft=True):
-    with wave.open('sound1.wav', 'rb') as wave_file:
+    with wave.open(wavefile_name, 'rb') as wave_file:
         # wave_file.setnchannels(1)
         # 2 bytes per sample.
         # wave_file.setsampwidth(2)
@@ -42,7 +42,7 @@ def run_fft_test(wavefile_name='sound1.wav', chunk_size=CHUNK_SIZE, use_real_fft
 
 
 def run_fft_rfft_test(wavefile_name='sound1.wav', chunk_size=CHUNK_SIZE):
-    with wave.open('sound1.wav', 'rb') as wave_file:
+    with wave.open(wavefile_name, 'rb') as wave_file:
         # wave_file.setnchannels(1)
         # 2 bytes per sample.
         # wave_file.setsampwidth(2)
@@ -74,7 +74,7 @@ def get_real_fourier_power(chunk):
 
 
 def pull_one_chunk(wavefile_name='sound1.wav', chunk_size=CHUNK_SIZE):
-    with wave.open('sound1.wav', 'rb') as wave_file:
+    with wave.open(wavefile_name, 'rb') as wave_file:
         samples = read_samples(wave_file, chunk_size)
     return samples
 
@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
     buf_size = 4096 ## 4096 -> 100ms chunk, 1024 --> 25ms approx
     buf_size = 256
-    samples = pull_one_chunk(buf_size)
+    samples = pull_one_chunk(wavefile_name='sound_song_endlessly_noisy.wav', chunk_size=buf_size)
     t_start = time.time()
     freq = get_frequencies(buf_size, SAMPLERATE)
     
