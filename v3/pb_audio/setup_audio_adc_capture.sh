@@ -17,7 +17,7 @@ echo 0 > /sys/bus/iio/devices/iio\:device0/buffer/enable
 echo 1 > /sys/bus/iio/devices/iio\:device0/scan_elements/in_voltage5_en
 
 # Set the buffer to capture 2048 elements at a time --> 51.2 ms
-BUF_SIZE=2048
+BUF_SIZE=8192
 echo $BUF_SIZE > /sys/bus/iio/devices/iio\:device0/buffer/length
 
 # enable the driver to capture continuously and store within buffers

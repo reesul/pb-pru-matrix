@@ -1,36 +1,3 @@
-/*
- * Copyright (C) 2018 Texas Instruments Incorporated - http://www.ti.com/
- *
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *	* Redistributions of source code must retain the above copyright
- *	  notice, this list of conditions and the following disclaimer.
- *
- *	* Redistributions in binary form must reproduce the above copyright
- *	  notice, this list of conditions and the following disclaimer in the
- *	  documentation and/or other materials provided with the
- *	  distribution.
- *
- *	* Neither the name of Texas Instruments Incorporated nor the names of
- *	  its contributors may be used to endorse or promote products derived
- *	  from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #include <stdint.h>
 #include <stdio.h>
 #include <pru_cfg.h>
@@ -39,10 +6,7 @@
 #include <pru_rpmsg.h>
 #include "resource_table_0.h"
 #include "prugpio.h"
-// #include <fcntl.h>
-//#include <sys/mman.h>
 
-// #define CHECK_IMG_INTEGRITY
 
 
 #define PRU_R1 1
@@ -60,7 +24,8 @@
 #define B2_BIT 1<<PRU_B2
 #define CLK_BIT 1<<PRU_CLK
 
-
+// GPIO defines for pins
+/// The por for pins A-D, not ports
 #define GPIO_PORT_A 1
 #define GPIO_PORT_B 1
 #define GPIO_PORT_C 1
@@ -79,34 +44,6 @@
 #define N_CHAN 3
 #define N_ROW 32
 #define N_COL 64
-
-/* Host-0 Interrupt sets bit 30 in register R31 */
-#define HOST_INT			((uint32_t) 1 << 30)
-
-/* The PRU-ICSS system events used for RPMsg are defined in the Linux device tree
- * PRU0 uses system event 16 (To ARM) and 17 (From ARM)
- * PRU1 uses system event 18 (To ARM) and 19 (From ARM)
- */
-#define TO_ARM_HOST			16
-#define FROM_ARM_HOST			17
-
-/*
- * Using the name 'rpmsg-pru' will probe the rpmsg_pru driver found
- * at linux-x.y.z/drivers/rpmsg/rpmsg_pru.c
- */
-#define CHAN_NAME			"rpmsg-pru"
-#define CHAN_DESC			"Channel 30"
-#define CHAN_PORT			30
-
-/*
- * Used to make sure the Linux drivers are ready for RPMsg communication
- * Found at linux-x.y.z/include/uapi/linux/virtio_config.h
- */
-#define VIRTIO_CONFIG_S_DRIVER_OK	4
-
-
-#define RPMSG_BUF_HEADER_SIZE           16
-uint8_t payload[RPMSG_BUF_SIZE - RPMSG_BUF_HEADER_SIZE]; //512 byte msg
 
 #define PRU_ADDR        0x4A300000      // Start of PRU memory Page 184 am335x TRM
 #define PRU_LEN         0x80000         // Length of PRU memory
@@ -159,9 +96,6 @@ void toggle_user_led_3_1ms(int n)
 		gpio1[GPIO_CLEARDATAOUT] = USR3;
 		__delay_cycles(100000); 
 	}
-   	// wait
-
-	// __delay_cycles(cycles>>1); 
 }
 
 void toggle_user_led_3_100ms(int n)
@@ -176,9 +110,6 @@ void toggle_user_led_3_100ms(int n)
 		gpio1[GPIO_CLEARDATAOUT] = USR3;
 		__delay_cycles(10000000); 
 	}
-   	// wait
-
-	// __delay_cycles(cycles>>1); 
 }
 
 uint8_t is_hash_same(char* local_md5, char* shared_md5)
@@ -310,8 +241,6 @@ void display_row(uint32_t delay_ns, uint8_t row_counter, uint8_t bit, \
         b2 = ( (blue_row2[col]) >> bit ) & 0x1;
 		
         write_color_bits(r1, g1, b1, r2, g2, b2);
-        // write_color_bits(b2, b2, b2, b2, b2, b2); // debug weird row FIXME
-		// write_color_bits(1, 1, 1, 1, 1, 1); //test case
 
     }
 
@@ -328,8 +257,6 @@ void main(void)
 {
 	char active_md5[MD5_SUM_LEN_BYTES];
 	memset((void*)active_image.mat, 0xff, sizeof(active_image));
-	// char active_image[N_CHAN][N_ROW][N_ROW] = {0xff};//= (char (*)[N_CHAN][N_ROW][N_COL]) active_image;
-	//memset(active_image, 0xff, sizeof(active_image));
 	//memset(active_md5, 0, sizeof(MD5_SUM_LEN_BYTES));
 	toggle_user_led_3_100ms(1);
 	__delay_cycles(DELAY_CYCLES_1S); 
@@ -337,14 +264,12 @@ void main(void)
 
 	int16_t bit = 7; //highest bit for now 
 	uint8_t row_counter = 15;
-	// uint32_t delay_ns_high_bit = 1000 * 10; //5ms is ok; 10us shows 'static' image
-
  
 	while (1) {
 		// __delay_cycles(DELAY_CYCLES_1S); 
 		// toggle_user_led_3_100ms(1);
 
-		if (!is_hash_same((char*)active_md5, (char*)md5_image_host) || 1)
+		if (!is_hash_same((char*)active_md5, (char*)md5_image_host))
 		{
 			
 			//__delay_cycles(DELAY_CYCLES_1S); 

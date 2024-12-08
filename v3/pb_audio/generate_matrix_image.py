@@ -1,45 +1,71 @@
 import numpy as np
 from pb_audio import constants as const
 
-def generate_spectrogram_image(fft_bins, image_shape=(const.MAT_SIZE_H, const.MAT_SIZE_W, 3), bin_width=const.BIN_PIXEL_WIDTH):
-    COLOR_WHITE = [255,255,255]
-    COLOR_RED = [0,0,255]
-    COLOR_GREEN = [0,255,0]
-    COLOR_BLUE = [255,0,0]
+VAL = 128
 
-    QUAD_WHITE=[0,const.MAT_SIZE_H//4] # TOP, BOTTOM
-    QUAD_RED=[const.MAT_SIZE_H//4, const.MAT_SIZE_H//2]
-    QUAD_GREEN=[const.MAT_SIZE_H//2, const.MAT_SIZE_H*3//4]
-    QUAD_BLUE=[const.MAT_SIZE_H*3//4, const.MAT_SIZE_H]
+COLOR_WHITE = np.asarray([VAL,VAL,VAL])[..., np.newaxis, np.newaxis]
+COLOR_RED = np.asarray([VAL,0,0])[..., np.newaxis, np.newaxis]
+COLOR_GREEN = np.asarray([0,VAL,0])[...,np.newaxis, np.newaxis]
+COLOR_BLUE = np.asarray([0,0,VAL])[...,np.newaxis, np.newaxis]
+
+def generate_spectrogram_image(fft_bins, image_shape=(const.MAT_NUM_CHANNEL, const.MAT_SIZE_H, const.MAT_SIZE_W), bin_width=const.BIN_PIXEL_WIDTH):
+
+    C,H,W = image_shape
+
+    QUAD_BLUE =  [0,H//4] # BOTTOM, TOP
+    QUAD_GREEN = [H//4, H//2]
+    QUAD_RED =   [H//2, H*3//4]
+    QUAD_WHITE = [H*3//4, H]
+
 
     image = np.zeros(image_shape, dtype=np.uint8)
 
-    bin_heights = (fft_bins * const.MAT_SIZE_H).astype(dtype=np.uint8)
-    bin_pixel_height = const.MAT_SIZE_H - bin_heights #flip up-down since pixels start from upper left
+    bin_pixel_height = (fft_bins * H).astype(dtype=np.uint8)
+    # bin_pixel_height = H - bin_pixel_height #flip up-down since pixels start from upper left
 
     num_bins = fft_bins.shape[0]
+    # print('num bins %d' % num_bins)
+    # print(image.shape)
 
+    ##UGLY, FIXME w/ better hardware
+    bin_pixel_height[6] = np.mean([bin_pixel_height[5], bin_pixel_height[7]])
 
     for i in range(num_bins):
+        # print(f'bin {i}')
         bin_height = bin_pixel_height[i]
-        cols = (i*2,(i+1)*2)
-        col_start = i*const.BIN_PIXEL_WIDTH
-        col_end = col_start + const.BIN_PIXEL_WIDTH
+        # print(f'bin height {bin_height}')
+        col_start = i * bin_width
+        col_end = col_start + bin_width
+        # print('%d:%d' % (col_start, col_end))
 
-        image[:,col_start:col_end] = color_bin_quadrant(image[:, col_start:col_end], COLOR_WHITE, bin_height, QUAD_WHITE[0], QUAD_WHITE[1])
-        image[:,col_start:col_end] = color_bin_quadrant(image[:, col_start:col_end], COLOR_RED, bin_height, QUAD_RED[0], QUAD_RED[1])
-        image[:,col_start:col_end] = color_bin_quadrant(image[:, col_start:col_end], COLOR_GREEN, bin_height, QUAD_GREEN[0], QUAD_GREEN[1])
-        image[:,col_start:col_end] = color_bin_quadrant(image[:, col_start:col_end], COLOR_BLUE, bin_height, QUAD_BLUE[0], QUAD_BLUE[1])
+        # print(image[:,:,col_start:col_end])
+
+        #### Map bin heights to color pixels
+        #TODO; make a cooler color map, and actually MAP that function here
+        # print('blue')
+        image[:,:,col_start:col_end] = color_bin_quadrant(image[:,:,col_start:col_end], COLOR_BLUE, bin_height, QUAD_BLUE[0], QUAD_BLUE[1])
+        # print('green')
+        image[:,:,col_start:col_end] = color_bin_quadrant(image[:,:,col_start:col_end], COLOR_GREEN, bin_height, QUAD_GREEN[0], QUAD_GREEN[1])
+        # print('red')
+        image[:,:,col_start:col_end] = color_bin_quadrant(image[:,:,col_start:col_end], COLOR_RED, bin_height, QUAD_RED[0], QUAD_RED[1])
+        # print('white')
+        image[:,:,col_start:col_end] = color_bin_quadrant(image[:, :, col_start:col_end], COLOR_WHITE, bin_height, QUAD_WHITE[0], QUAD_WHITE[1])
+        # print(image[:,:,col_start:col_end])
+
 
     return image
 
-def color_bin_quadrant(bin, color, bin_value, quadrant_top, quadrant_bottom, bin_height=const.MAT_SIZE_H, bin_width=const.BIN_PIXEL_WIDTH):
+def color_bin_quadrant(bin, color, bin_value, quadrant_bottom, quadrant_top, bin_height=const.MAT_SIZE_H, bin_width=const.BIN_PIXEL_WIDTH):
 
-    if bin_value > quadrant_bottom:
+    if bin_value <= quadrant_bottom:
         pass #remain as zeros
-    if bin_value < quadrant_top:
-        bin[quadrant_top:quadrant_bottom,:,:] = color
+    elif bin_value >= quadrant_top:
+        bin[:,quadrant_bottom:quadrant_top,:] = color
     else:
-        bin[bin_value:quadrant_bottom,:,:] = color
+        bin[:,quadrant_bottom:bin_value,:] = color
 
     return bin
+
+if __name__ == '__main__' :
+
+    print('No main for ' + __file__)
