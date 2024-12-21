@@ -21,6 +21,9 @@ def read_buf(dev_file, chunk_size):
     buf = dev_file.read(chunk_size) #flush
     return buf
 
+def read_all_available_types(dev_file):
+    return dev_file.read()
+
 def format_samples(sample_bytes):
     samples_np = np.frombuffer(sample_bytes, dtype='<h')
     return samples_np
@@ -63,6 +66,24 @@ def _test_main():
     print(f'{len(buffer)} samples')
 
     write_to_wav(buffer)
+
+def read_speed_test():
+    dev_file = open_audio(const.DEV_ADC_FILEPATH)
+
+    for i in range(100):
+        read_buf(dev_file, chunk_size=2048)
+
+    t_total = 0
+    NUM_TEST=100
+    CHUNK_SIZE = 2048
+    for i in range(NUM_TEST):
+        t1= time.time()
+        read_buf(dev_file, chunk_size=CHUNK_SIZE)
+        t2 = time.time()
+        t_total += (t2-t1)
+
+    print('Took %s to run %d iteratiosn of %d bytes (2samples/byte default)' % (t_total, NUM_TEST, CHUNK_SIZE))
+
 
 if __name__ == '__main__':
     _test_main()

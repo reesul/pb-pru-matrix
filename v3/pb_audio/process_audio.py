@@ -44,6 +44,7 @@ def run_fft_rfft_test(wavefile_name='sound1.wav', chunk_size=const.CHUNK_SIZE_BY
 
         t1 = time.time()
         freq_domain = np.fft.fft(samples)
+        t2 = time.time()
         print(freq_domain.shape)
         rfreq_domain = np.fft.rfft(samples)
         print(rfreq_domain.shape)
@@ -107,29 +108,43 @@ def rebin_logarithmic(power_spectrum, freq, num_bins=const.NUM_OUTPUT_BINS, log_
     """ 
     Re-bin the power spectrum into a specified number of logarithmically spaced bins 
         provided by copilot...  
+
+    Algo:
+        trim frequency/power spectrum to min / max frequencies
+        generate a set of bins over which to average power spectrum -- use log as basis
+            - also ensure that no frequency bins are being ignored or rejected.. somewhat hard
+        rebin power according to bin indices -- average power within joined frequency bins
     """ 
           
     #filter to min and max frequencies
     keep_indices = np.logical_and(freq > min_freq, freq < max_freq) 
 
     power_spectrum = power_spectrum[keep_indices]
+    freq = freq[keep_indices]
 
     length = len(power_spectrum) 
     
-    new_bins = np.logspace(0, np.log(length)/np.log(log_base), num_bins+1, base=log_base) 
+    #for num_bin power bins, we need num_bin+1 indices that separate each bin
+    new_bins = np.logspace(0, np.log(length)/np.log(log_base), num_bins+1, base=log_base)   # OG
+    # new_bins = np.logspace(0, length, num_bins+1, base=log_base)  
+    new_bins = new_bins - 1 #otherwise 0th bin is ignored
     # print(new_bins)
+    # print(new_bins[0:10])
 
     rebin_power = np.zeros(num_bins) 
 
-    start = end = 1
+    start = end = 0
     bin_inds = np.zeros((num_bins,2))
     for i in range(0, num_bins): 
         start = max(int(new_bins[i]), end) 
         end = int(new_bins[i+1]) 
         if start >= end: 
+            #means we've gotten ahead of the bin indices, which is likely at low frequencies
             end = start+1
 
-        # print('%d:%d' % (start, end) )
+        if i<8:
+            # print(freq[start:end] )
+            pass
         rebin_power[i] = np.mean(power_spectrum[start:end]) 
         bin_inds[i,:] = [start, end]
 
@@ -149,8 +164,7 @@ def normalize_fft(fft_bins):
 
 def process_chunk(samples, chunk_size=const.BUF_SIZE_SAMPLES):
 
-
-    freq = get_frequencies(chunk_size, const.SAMPLERATE)
+    freq = get_frequencies(len(samples), const.SAMPLERATE)
 
     power_db = get_real_fourier_power(samples)
 

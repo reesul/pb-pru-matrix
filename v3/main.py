@@ -4,8 +4,13 @@ import time
 from pb_audio import constants as const
 from pb_audio import read_audio, pru_transfer, generate_matrix_image, process_audio
 import numpy as np
+import argparse
 
-PRINT_PROFILING=False
+parser = argparse.ArgumentParser()
+parser.add_argument('-v', '--verbose', action="store_true", default=False)
+args = parser.parse_args()
+
+PRINT_PROFILING=args.verbose
 
 def main():
     print('Start Pocketbeagle audio-visualizer')
@@ -23,6 +28,9 @@ def main():
     try:
         print('Start main loop')
         while True:
+
+            for i in range(const.FLUSH_ITER):
+                read_audio.read_buf(audio_dev_file, chunk_size=const.FLUSH_BUF_SIZE)
             
             # read newest set of samples
             t_read_start = time.time()
