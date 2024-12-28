@@ -202,7 +202,7 @@ def spatial_smoothing(power_spectrum):
     if const.BIN_PIXEL_WIDTH == 2:
        filtered_specrogram = gaussian_filter(power_spectrum, sigma=0.75, truncate=3, mode='constant')
     elif const.BIN_PIXEL_WIDTH == 1:
-        filtered_specrogram = gaussian_filter(power_spectrum, sigma=1.5, truncate=2, mode='constant')
+        filtered_specrogram = gaussian_filter(power_spectrum, sigma=1.4, truncate=2, mode='constant')
 
 
     return filtered_specrogram
@@ -211,7 +211,7 @@ def temporal_smoothing(power_spectrum):
     
     
     # 0 to 1, with 1 being only current value and 0 being only most recent
-    alpha = 0.7 
+    alpha = 0.725 
     if temporal_smoothing.last_power_spectrum is None:
         temporal_smoothing.last_power_spectrum = power_spectrum
 
