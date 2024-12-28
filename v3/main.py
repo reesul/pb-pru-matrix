@@ -28,6 +28,8 @@ def sliding_window(old_audio, new_audio, output_buf_size=const.PROCESSING_CHUNK_
 
 def main():
     print('Start Pocketbeagle audio-visualizer')
+
+    baseline_image = generate_matrix_image.baseline_image(const.MAT_SIZE_H, const.MAT_SIZE_W, max_val=255)
     
     #setup comms to PRU
     pru_shared_mem = pru_transfer.open_pru_mem()
@@ -72,9 +74,9 @@ def main():
             t_process_audio = time.time()
 
             #  generate image - follow standard 
-            #TODO: fix image dimension layout to follow CHW natively, so no change and copy is needed
-
-            image = generate_matrix_image.generate_spectrogram_image(norm_log_fft_bins, image_shape=[const.MAT_NUM_CHANNEL, const.MAT_SIZE_H, const.MAT_SIZE_W], bin_width=const.BIN_PIXEL_WIDTH)
+            #TODO: use masked baseline image
+            image = generate_matrix_image.mask_baseline_image(baseline_image, norm_log_fft_bins)
+            # image = generate_matrix_image.generate_spectrogram_image(norm_log_fft_bins, image_shape=[const.MAT_NUM_CHANNEL, const.MAT_SIZE_H, const.MAT_SIZE_W], bin_width=const.BIN_PIXEL_WIDTH)
 
             t_gen_image = time.time()
 
