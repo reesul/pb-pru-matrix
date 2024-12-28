@@ -1,7 +1,7 @@
 import numpy as np
 from pb_audio import constants as const
 
-VAL = 128
+VAL = const.IMAGE_MAX_VAL #TODO make arg
 
 COLOR_WHITE = np.asarray([VAL,VAL,VAL])[..., np.newaxis, np.newaxis]
 COLOR_RED = np.asarray([VAL,0,0])[..., np.newaxis, np.newaxis]
@@ -26,9 +26,6 @@ def generate_spectrogram_image(fft_bins, image_shape=(const.MAT_NUM_CHANNEL, con
     num_bins = fft_bins.shape[0]
     # print('num bins %d' % num_bins)
     # print(image.shape)
-
-    ##UGLY, FIXME w/ better hardware
-    bin_pixel_height[6] = np.mean([bin_pixel_height[5], bin_pixel_height[7]])
 
     for i in range(num_bins):
         # print(f'bin {i}')
@@ -65,6 +62,13 @@ def color_bin_quadrant(bin, color, bin_value, quadrant_bottom, quadrant_top, bin
         bin[:,quadrant_bottom:bin_value,:] = color
 
     return bin
+
+import cv2 #slow, may try pickleizing baseline image
+def baseline_image(height,width):
+    # cv2.colormap
+    np.ones((height,width, 3))
+    pass
+
 
 if __name__ == '__main__' :
 

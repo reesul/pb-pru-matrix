@@ -1,8 +1,9 @@
 
 DEV_ADC_FILEPATH = '/dev/iio:device0'
-BUF_SIZE_SAMPLES = 1024 #1024 to 2048 are most acceptable. Pref power of 2
+BUF_SIZE_SAMPLES = 768 #1024 to 2048 are most acceptable. Pref power of 2
 BYTES_PER_SAMPLE = 2 #uint16 containers
 CHUNK_SIZE_BYTES = BUF_SIZE_SAMPLES * BYTES_PER_SAMPLE
+PROCESSING_CHUNK_SIZE = 1024
 SAMPLERATE = 20000 
 FLUSH_ITER = 0
 FLUSH_BUF_SIZE = 256
@@ -16,3 +17,6 @@ FREQ_MIN=18 #Hz, lower than 20 to capture 19. and such
 FREQ_MAX= SAMPLERATE / 2
 
 NUM_OUTPUT_BINS = int(MAT_SIZE_W / BIN_PIXEL_WIDTH)
+MIN_MAX_DB = 75
+
+IMAGE_MAX_VAL = 1

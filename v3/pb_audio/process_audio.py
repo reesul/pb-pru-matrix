@@ -153,11 +153,23 @@ def rebin_logarithmic(power_spectrum, freq, num_bins=const.NUM_OUTPUT_BINS, log_
 
     return rebin_power, bin_inds
 
+def mask_band(non_log_power, freq, HZ_TARGET=60):
+
+    ind_lower = ind_higher = 0
+    bin = -1
+    for i, f in enumerate(freq):
+        if f < HZ_TARGET and freq[i+1] > HZ_TARGET:
+            bin = i
+            break
+
+    non_log_power[bin] = (non_log_power[bin-1] + non_log_power[bin+1]) / 2
+    return non_log_power
 
 
-def normalize_fft(fft_bins):
+def normalize_fft(fft_bins, MINIMUM_MAX=const.MIN_MAX_DB):
     mm = np.min(fft_bins)
     MM = np.max(fft_bins)
+    MM = max(MINIMUM_MAX, MM)
 
     normalized = (fft_bins - mm) / (MM- mm)
     return normalized
@@ -168,15 +180,47 @@ def process_chunk(samples, chunk_size=const.BUF_SIZE_SAMPLES):
 
     power_db = get_real_fourier_power(samples)
 
+    power_db = mask_band(power_db, freq, HZ_TARGET=60)
+    power_db = mask_band(power_db, freq, HZ_TARGET=120)
+
     # power_db[0] = np.min(power_db)
 
     log_power_bins, new_bin_indices = rebin_logarithmic(power_db, freq, min_freq=const.FREQ_MIN, max_freq=const.FREQ_MAX)
     # freq_bins = freq[new_bin_indices] #incorrect code, probably needs lambda func
     # log_power_bins[0] = np.min(log_power_bins)
 
-    normalized_log_fft_bins = normalize_fft(log_power_bins)
+    normalized_log_fft_bins = normalize_fft(log_power_bins, MINIMUM_MAX=const.MIN_MAX_DB)
 
     return normalized_log_fft_bins
+
+
+from scipy.ndimage import gaussian_filter
+def spatial_smoothing(power_spectrum):
+    #try other types of filters. Want something a bit sharper
+    filtered_specrogram = power_spectrum
+    
+    if const.BIN_PIXEL_WIDTH == 2:
+       filtered_specrogram = gaussian_filter(power_spectrum, sigma=0.75, truncate=3, mode='constant')
+    elif const.BIN_PIXEL_WIDTH == 1:
+        filtered_specrogram = gaussian_filter(power_spectrum, sigma=1.5, truncate=2, mode='constant')
+
+
+    return filtered_specrogram
+
+def temporal_smoothing(power_spectrum):
+    
+    
+    # 0 to 1, with 1 being only current value and 0 being only most recent
+    alpha = 0.7 
+    if temporal_smoothing.last_power_spectrum is None:
+        temporal_smoothing.last_power_spectrum = power_spectrum
+
+    power_spectrum = alpha * (power_spectrum) + (1-alpha) *  temporal_smoothing.last_power_spectrum
+
+    temporal_smoothing.last_power_spectrum = power_spectrum
+    return power_spectrum
+
+temporal_smoothing.last_power_spectrum = None
 
 
 def _test_on_image_file(filename='sound_song_endlessly_noisy.wav', buf_size=const.BUF_SIZE_SAMPLES):

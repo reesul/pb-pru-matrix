@@ -21,7 +21,7 @@ def read_buf(dev_file, chunk_size):
     buf = dev_file.read(chunk_size) #flush
     return buf
 
-def read_all_available_types(dev_file):
+def read_all_available_bytes(dev_file):
     return dev_file.read()
 
 def format_samples(sample_bytes):
