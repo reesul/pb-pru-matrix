@@ -79,6 +79,8 @@ typedef struct matrix_img {
 #define DELAY_CYCLES_100MS (20000000)
 #define DELAY_CYCLES_1S (200000000)
 
+#define DELAY_CYCLES_DIMMER (DELAY_CYCLES_MS * 10)
+
 #define MAX_COLOR_BITS (8)
 #define COLOR_BITS (8)
 #define UNUSED_COLOR_BITS ( MAX_COLOR_BITS - COLOR_BITS )
@@ -198,13 +200,13 @@ void latch_and_enable(uint32_t* gpio_ports[4], uint32_t delay_ns)
 {
     gpio_ports[GPIO_PORT_LATCH][GPIO_SETDATAOUT] = LATCH_BIT;
     gpio_ports[GPIO_PORT_OE][GPIO_SETDATAOUT] = OE_BIT;
-    __delay_cycles(500); //5 cycles is sufficient
+    __delay_cycles(50); //50 cycles is sufficient
 
     gpio_ports[GPIO_PORT_LATCH][GPIO_CLEARDATAOUT] = LATCH_BIT;
-    __delay_cycles(500);
+    __delay_cycles(50);
 
     gpio_ports[GPIO_PORT_OE][GPIO_CLEARDATAOUT] = OE_BIT;
-    __delay_cycles(500);
+    __delay_cycles(50);
 
     //200 MHz -> 5ns/cycle
 	// toggle_user_led_3_100ms(1);
@@ -317,6 +319,8 @@ void main(void)
 		// __delay_cycles(DELAY_CYCLES_1S); 
 		// toggle_user_led_3_100ms(20);
 		// __delay_cycles(DELAY_CYCLES_1S); 
+
+		__delay_cycles(DELAY_CYCLES_DIMMER);
 
 	}
 

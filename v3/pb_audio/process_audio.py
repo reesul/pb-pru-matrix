@@ -211,13 +211,15 @@ def temporal_smoothing(power_spectrum):
     
     
     # 0 to 1, with 1 being only current value and 0 being only most recent
-    alpha = 0.725 
+    alpha = 0.65 
     if temporal_smoothing.last_power_spectrum is None:
         temporal_smoothing.last_power_spectrum = power_spectrum
 
+    cur_power_spectrum = power_spectrum
+
     power_spectrum = alpha * (power_spectrum) + (1-alpha) *  temporal_smoothing.last_power_spectrum
 
-    temporal_smoothing.last_power_spectrum = power_spectrum
+    temporal_smoothing.last_power_spectrum = cur_power_spectrum
     return power_spectrum
 
 temporal_smoothing.last_power_spectrum = None
