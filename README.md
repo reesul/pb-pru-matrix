@@ -71,4 +71,4 @@ But I still want a PRU for the signalling. I suppose newer TI processors have mo
 
 ##### Video of the thing
 
-![demo video](./resources/pb-viz-demo-video.MOV)
+![demo video](./resources/pb-viz-demo-video.mp4)
