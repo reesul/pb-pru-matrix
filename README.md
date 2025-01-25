@@ -46,6 +46,7 @@ The actual code itself for this application is under [](./led_matrix_audio_spect
 
 I got to MVP / PoC, but I know there's more I can do to improve this. Some of those things include (roughly prioritized):
 
+0. Put on beagleprojects with a guide to replicating v1
 1. Revise matrix cape to improve signal quality and have easier connections
    - Add low pass filter to have a ~10kHz knee (2-3 taps) to reduce the aliasing I get from 20kS/s samplerate
        * If I can get processing loop fast enough, I can go faster and use 30-40kS/s, but it's diminishing returns on these bands anyway
@@ -71,5 +72,5 @@ But I still want a PRU for the signalling. I suppose newer TI processors have mo
 
 ##### Video of the thing
 
-[![Watch the video](./resources/pb-viz.jpg)](https://youtu.be/7bbwP2FQwTU)]
+[![Watch the video](./resources/pb-viz.jpg)](https://youtu.be/7bbwP2FQwTU)
 
