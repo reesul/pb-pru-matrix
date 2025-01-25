@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2024-02-03T18:23:52Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.6.2"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "PocketBeagle"
+        },
+        "Owner": "Reese Grimsley <rgrimsle@andrew.cmu.edu>",
+        "Size": {
+            "X": 128.016,
+            "Y": 35.56
+        }
+    }
+}

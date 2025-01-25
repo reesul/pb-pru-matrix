@@ -1,0 +1,365 @@
+# Created by Ultra Librarian 8.3.344 Copyright © 1999-2021
+# Frank Frank, Accelerated Designs
+
+Grid mil;
+Set Wire_Bend 2;
+
+
+Edit 'CONN16_SBH11-PBPC-D08-ST-BK_SU.pac';
+Grid Mil;
+Change Drill 39;
+Pad '1' Round 0 59 R0 (0 0);
+Change Drill 39;
+Pad '2' Round 0 59 R0 (0 -100);
+Change Drill 39;
+Pad '3' Round 0 59 R0 (100 0);
+Change Drill 39;
+Pad '4' Round 0 59 R0 (100 -100);
+Change Drill 39;
+Pad '5' Round 0 59 R0 (200 0);
+Change Drill 39;
+Pad '6' Round 0 59 R0 (200 -100);
+Change Drill 39;
+Pad '7' Round 0 59 R0 (300 0);
+Change Drill 39;
+Pad '8' Round 0 59 R0 (300 -100);
+Change Drill 39;
+Pad '9' Round 0 59 R0 (400 0);
+Change Drill 39;
+Pad '10' Round 0 59 R0 (400 -100);
+Change Drill 39;
+Pad '11' Round 0 59 R0 (500 0);
+Change Drill 39;
+Pad '12' Round 0 59 R0 (500 -100);
+Change Drill 39;
+Pad '13' Round 0 59 R0 (600 0);
+Change Drill 39;
+Pad '14' Round 0 59 R0 (600 -100);
+Change Drill 39;
+Pad '15' Round 0 59 R0 (700 0);
+Change Drill 39;
+Pad '16' Round 0 59 R0 (700 -100);
+Layer 47;
+Wire 6 (0 0) (0 229);
+Wire 6 (100 0) (100 229);
+Wire 6 (0 214) (-50 214);
+Wire 6 (100 214) (150 214);
+Wire 6 (0 214) (-10 219);
+Wire 6 (0 214) (-10 209);
+Wire 6 (-10 219) (-10 209);
+Wire 6 (100 214) (110 219);
+Wire 6 (100 214) (110 209);
+Wire 6 (110 219) (110 209);
+Wire 6 (-198 129) (-198 554);
+Wire 6 (898 129) (898 554);
+Wire 6 (-198 539) (898 539);
+Wire 6 (-198 539) (-188 544);
+Wire 6 (-198 539) (-188 534);
+Wire 6 (-188 544) (-188 534);
+Wire 6 (898 539) (888 544);
+Wire 6 (898 539) (888 534);
+Wire 6 (888 544) (888 534);
+Wire 6 (0 0) (1012 0);
+Wire 6 (0 -100) (1012 -100);
+Wire 6 (998 0) (998 50);
+Wire 6 (998 -100) (998 -150);
+Wire 6 (998 0) (992 10);
+Wire 6 (998 0) (1002 10);
+Wire 6 (992 10) (1002 10);
+Wire 6 (998 -100) (992 -110);
+Wire 6 (998 -100) (1002 -110);
+Wire 6 (992 -110) (1002 -110);
+Wire 6 (-198 129) (-572 129);
+Wire 6 (350 -50) (-572 -50);
+Wire 6 (-558 129) (-558 -50);
+Wire 6 (-558 129) (-562 119);
+Wire 6 (-558 129) (-552 119);
+Wire 6 (-562 119) (-552 119);
+Wire 6 (-558 -50) (-562 -40);
+Wire 6 (-558 -50) (-552 -40);
+Wire 6 (-562 -40) (-552 -40);
+Wire 6 (-198 129) (-522 129);
+Wire 6 (-198 -229) (-522 -229);
+Wire 6 (-508 129) (-508 -229);
+Wire 6 (-508 129) (-512 119);
+Wire 6 (-508 129) (-502 119);
+Wire 6 (-512 119) (-502 119);
+Wire 6 (-508 -229) (-512 -219);
+Wire 6 (-508 -229) (-502 -219);
+Wire 6 (-512 -219) (-502 -219);
+Change Size 50;
+Change Ratio 6;
+Text 'Default Padstyle: OX59Y59D39P' SR0 (-271 -389);
+Change Size 50;
+Change Ratio 6;
+Text '1st Mtg Padstyle: RX110Y80D50P' SR0 (-301 -464);
+Change Size 50;
+Change Ratio 6;
+Text '2nd Mtg Padstyle: RX100Y300D70P' SR0 (-331 -539);
+Change Size 50;
+Change Ratio 6;
+Text '3rd Mtg Padstyle: RX100Y70D10P' SR0 (-309 -614);
+Change Size 50;
+Change Ratio 6;
+Text 'Left Mtg Padstyle: EX60Y60D30P' SR0 (-294 -689);
+Change Size 50;
+Change Ratio 6;
+Text 'Right Mtg Padstyle: EX60Y60D30P' SR0 (-317 -764);
+Change Size 50;
+Change Ratio 6;
+Text 'Alt Padstyle 1: OX60Y90D30P' SR0 (-233 -839);
+Change Size 50;
+Change Ratio 6;
+Text 'Alt Padstyle 2: OX90Y60D30P' SR0 (-233 -914);
+Change Size 25;
+Change Ratio 4;
+Text '0.1in/2.54mm' SR0 (-75 234);
+Change Size 25;
+Change Ratio 4;
+Text '1.095in/27.813mm' SR0 (180 559);
+Change Size 25;
+Change Ratio 4;
+Text '0.1in/2.54mm' SR0 (1018 -62);
+Change Size 25;
+Change Ratio 4;
+Text '0.179in/4.547mm' SR0 (-896 27);
+Change Size 25;
+Change Ratio 4;
+Text '0.358in/9.093mm' SR0 (-846 -62);
+Layer 21;
+Wire 6 (-202 -234) (902 -234);
+Wire 6 (902 -234) (902 134);
+Wire 6 (902 134) (-202 134);
+Wire 6 (-202 134) (-202 -234);
+Wire 20 (-212 0) -180 (-242 0);
+Wire 20 (-242 0) -180 (-212 0);
+Layer 51;
+Wire 6 (-198 -229) (898 -229);
+Wire 6 (898 -229) (898 129);
+Wire 6 (898 129) (-198 129);
+Wire 6 (-198 129) (-198 -229);
+Wire 20 (15 75) -180 (-15 75);
+Wire 20 (-15 75) -180 (15 75);
+Layer 22;
+Wire 20 (-212 0) -180 (-242 0);
+Wire 20 (-242 0) -180 (-212 0);
+Layer 48;
+Layer 27;
+Change Size 50;
+Change Ratio 6;
+Text '>Name' SR0 (221 -75);
+Change Size 50;
+Change Ratio 6;
+Text '>Value' SR0 (282 -75);
+Layer 25;
+
+Edit 'CONN16_SBH11-PBPC-D08-ST-BK.sym';
+Grid Mil;
+Layer 94;
+Pin '1' Pas None Middle R0 Pad 0 (0 0)
+Pin '2' Pas None Middle R0 Pad 0 (0 -100)
+Pin '3' Pas None Middle R0 Pad 0 (0 -200)
+Pin '4' Pas None Middle R0 Pad 0 (0 -300)
+Pin '5' Pas None Middle R0 Pad 0 (0 -400)
+Pin '6' Pas None Middle R0 Pad 0 (0 -500)
+Pin '7' Pas None Middle R0 Pad 0 (0 -600)
+Pin '8' Pas None Middle R0 Pad 0 (0 -700)
+Pin '9' Pas None Middle R0 Pad 0 (0 -800)
+Pin '10' Pas None Middle R0 Pad 0 (0 -900)
+Pin '11' Pas None Middle R0 Pad 0 (0 -1000)
+Pin '12' Pas None Middle R0 Pad 0 (0 -1100)
+Pin '13' Pas None Middle R0 Pad 0 (0 -1200)
+Pin '14' Pas None Middle R0 Pad 0 (0 -1300)
+Pin '15' Pas None Middle R0 Pad 0 (0 -1400)
+Pin '16' Pas None Middle R0 Pad 0 (0 -1500)
+Wire 6 (400 0) (200 0);
+Wire 6 (400 -100) (200 -100);
+Wire 6 (400 -200) (200 -200);
+Wire 6 (400 -300) (200 -300);
+Wire 6 (400 -400) (200 -400);
+Wire 6 (400 -500) (200 -500);
+Wire 6 (400 -600) (200 -600);
+Wire 6 (400 -700) (200 -700);
+Wire 6 (400 -800) (200 -800);
+Wire 6 (400 -900) (200 -900);
+Wire 6 (400 -1000) (200 -1000);
+Wire 6 (400 -1100) (200 -1100);
+Wire 6 (400 -1200) (200 -1200);
+Wire 6 (400 -1300) (200 -1300);
+Wire 6 (400 -1400) (200 -1400);
+Wire 6 (400 -1500) (200 -1500);
+Wire 6 (400 0) (350 33);
+Wire 6 (400 -100) (350 -67);
+Wire 6 (400 -200) (350 -167);
+Wire 6 (400 -300) (350 -267);
+Wire 6 (400 -400) (350 -367);
+Wire 6 (400 -500) (350 -467);
+Wire 6 (400 -600) (350 -567);
+Wire 6 (400 -700) (350 -667);
+Wire 6 (400 -800) (350 -767);
+Wire 6 (400 -900) (350 -867);
+Wire 6 (400 -1000) (350 -967);
+Wire 6 (400 -1100) (350 -1067);
+Wire 6 (400 -1200) (350 -1167);
+Wire 6 (400 -1300) (350 -1267);
+Wire 6 (400 -1400) (350 -1367);
+Wire 6 (400 -1500) (350 -1467);
+Wire 6 (400 0) (350 -33);
+Wire 6 (400 -100) (350 -133);
+Wire 6 (400 -200) (350 -233);
+Wire 6 (400 -300) (350 -333);
+Wire 6 (400 -400) (350 -433);
+Wire 6 (400 -500) (350 -533);
+Wire 6 (400 -600) (350 -633);
+Wire 6 (400 -700) (350 -733);
+Wire 6 (400 -800) (350 -833);
+Wire 6 (400 -900) (350 -933);
+Wire 6 (400 -1000) (350 -1033);
+Wire 6 (400 -1100) (350 -1133);
+Wire 6 (400 -1200) (350 -1233);
+Wire 6 (400 -1300) (350 -1333);
+Wire 6 (400 -1400) (350 -1433);
+Wire 6 (400 -1500) (350 -1533);
+Wire 6 (200 100) (200 -1600);
+Wire 6 (200 -1600) (500 -1600);
+Wire 6 (500 -1600) (500 100);
+Wire 6 (500 100) (200 100);
+Layer 97;
+Layer 95;
+Change Size 82;
+Change Ratio 6;
+Text '>Name' SR0 (164 209);
+
+Edit 'CONN16_SBH11-PBPC-D08-ST-BK_2.sym';
+Grid Mil;
+Layer 94;
+Pin '1' Pas None Middle R0 Pad 0 (0 0)
+Pin '2' Pas None Middle R0 Pad 0 (0 -100)
+Pin '3' Pas None Middle R0 Pad 0 (0 -200)
+Pin '4' Pas None Middle R0 Pad 0 (0 -300)
+Pin '5' Pas None Middle R0 Pad 0 (0 -400)
+Pin '6' Pas None Middle R0 Pad 0 (0 -500)
+Pin '7' Pas None Middle R0 Pad 0 (0 -600)
+Pin '8' Pas None Middle R0 Pad 0 (0 -700)
+Pin '9' Pas None Middle R0 Pad 0 (0 -800)
+Pin '10' Pas None Middle R0 Pad 0 (0 -900)
+Pin '11' Pas None Middle R0 Pad 0 (0 -1000)
+Pin '12' Pas None Middle R0 Pad 0 (0 -1100)
+Pin '13' Pas None Middle R0 Pad 0 (0 -1200)
+Pin '14' Pas None Middle R0 Pad 0 (0 -1300)
+Pin '15' Pas None Middle R0 Pad 0 (0 -1400)
+Pin '16' Pas None Middle R0 Pad 0 (0 -1500)
+Wire 6 (300 0) (200 0);
+Wire 6 (300 -100) (200 -100);
+Wire 6 (300 -200) (200 -200);
+Wire 6 (300 -300) (200 -300);
+Wire 6 (300 -400) (200 -400);
+Wire 6 (300 -500) (200 -500);
+Wire 6 (300 -600) (200 -600);
+Wire 6 (300 -700) (200 -700);
+Wire 6 (300 -800) (200 -800);
+Wire 6 (300 -900) (200 -900);
+Wire 6 (300 -1000) (200 -1000);
+Wire 6 (300 -1100) (200 -1100);
+Wire 6 (300 -1200) (200 -1200);
+Wire 6 (300 -1300) (200 -1300);
+Wire 6 (300 -1400) (200 -1400);
+Wire 6 (300 -1500) (200 -1500);
+Wire 6 (300 0) (350 33);
+Wire 6 (300 -100) (350 -67);
+Wire 6 (300 -200) (350 -167);
+Wire 6 (300 -300) (350 -267);
+Wire 6 (300 -400) (350 -367);
+Wire 6 (300 -500) (350 -467);
+Wire 6 (300 -600) (350 -567);
+Wire 6 (300 -700) (350 -667);
+Wire 6 (300 -800) (350 -767);
+Wire 6 (300 -900) (350 -867);
+Wire 6 (300 -1000) (350 -967);
+Wire 6 (300 -1100) (350 -1067);
+Wire 6 (300 -1200) (350 -1167);
+Wire 6 (300 -1300) (350 -1267);
+Wire 6 (300 -1400) (350 -1367);
+Wire 6 (300 -1500) (350 -1467);
+Wire 6 (300 0) (350 -33);
+Wire 6 (300 -100) (350 -133);
+Wire 6 (300 -200) (350 -233);
+Wire 6 (300 -300) (350 -333);
+Wire 6 (300 -400) (350 -433);
+Wire 6 (300 -500) (350 -533);
+Wire 6 (300 -600) (350 -633);
+Wire 6 (300 -700) (350 -733);
+Wire 6 (300 -800) (350 -833);
+Wire 6 (300 -900) (350 -933);
+Wire 6 (300 -1000) (350 -1033);
+Wire 6 (300 -1100) (350 -1133);
+Wire 6 (300 -1200) (350 -1233);
+Wire 6 (300 -1300) (350 -1333);
+Wire 6 (300 -1400) (350 -1433);
+Wire 6 (300 -1500) (350 -1533);
+Wire 6 (200 100) (200 -1600);
+Wire 6 (200 -1600) (500 -1600);
+Wire 6 (500 -1600) (500 100);
+Wire 6 (500 100) (200 100);
+Layer 97;
+Layer 95;
+Change Size 82;
+Change Ratio 6;
+Text '>Name' SR0 (164 209);
+
+Edit 'CONN16_SBH11-PBPC-D08-ST-BK_3.sym';
+Grid Mil;
+Layer 94;
+Pin '1' Pas None Middle R0 Pad 0 (0 0)
+Pin '2' Pas None Middle R0 Pad 0 (0 -100)
+Pin '3' Pas None Middle R0 Pad 0 (0 -200)
+Pin '4' Pas None Middle R0 Pad 0 (0 -300)
+Pin '5' Pas None Middle R0 Pad 0 (0 -400)
+Pin '6' Pas None Middle R0 Pad 0 (0 -500)
+Pin '7' Pas None Middle R0 Pad 0 (0 -600)
+Pin '8' Pas None Middle R0 Pad 0 (0 -700)
+Pin '9' Pas None Middle R0 Pad 0 (0 -800)
+Pin '10' Pas None Middle R0 Pad 0 (0 -900)
+Pin '11' Pas None Middle R0 Pad 0 (0 -1000)
+Pin '12' Pas None Middle R0 Pad 0 (0 -1100)
+Pin '13' Pas None Middle R0 Pad 0 (0 -1200)
+Pin '14' Pas None Middle R0 Pad 0 (0 -1300)
+Pin '15' Pas None Middle R0 Pad 0 (0 -1400)
+Pin '16' Pas None Middle R0 Pad 0 (0 -1500)
+Wire 6 (200 100) (200 -1600);
+Wire 6 (200 -1600) (500 -1600);
+Wire 6 (500 -1600) (500 100);
+Wire 6 (500 100) (200 100);
+Layer 97;
+Layer 95;
+Change Size 82;
+Change Ratio 6;
+Text '>Name' SR0 (164 209);
+
+Edit 'SBH11-PBPC-D08-ST-BK.dev';
+Prefix 'J';
+Description '';
+Value Off;
+Add CONN16_SBH11-PBPC-D08-ST-BK 'A' Next  0 (0 0);
+Package 'CONN16_SBH11-PBPC-D08-ST-BK_SU';
+Technology '';
+Attribute Type 'Headers, Male Pins';
+Attribute Copyright 'Copyright (C) 2023 Ultra Librarian. All rights reserved.';
+Attribute Mfr_Name 'Sullins';
+Attribute Manufacturer_Part_Number 'SBH11-PBPC-D08-ST-BK';
+Connect 'A.1' '1';
+Connect 'A.2' '2';
+Connect 'A.3' '3';
+Connect 'A.4' '4';
+Connect 'A.5' '5';
+Connect 'A.6' '6';
+Connect 'A.7' '7';
+Connect 'A.8' '8';
+Connect 'A.9' '9';
+Connect 'A.10' '10';
+Connect 'A.11' '11';
+Connect 'A.12' '12';
+Connect 'A.13' '13';
+Connect 'A.14' '14';
+Connect 'A.15' '15';
+Connect 'A.16' '16';

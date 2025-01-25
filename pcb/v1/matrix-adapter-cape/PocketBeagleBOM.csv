@@ -1,0 +1,28 @@
+Part,Value,Device,Package,Description,COPYRIGHT,MANUFACTURER,MANUFACTURER_PART_NUMBER,MFR_NAME,MPN,POPULARITY,TC,TOL,TP_SIGNAL_NAME,TYPE,VOLTAGE
+U3,TPD4S012DRY,TPD4S012DRYR,SON-6(TI)-DRY,,,,TPD4S012DRYR,,,,,,,,
+J1,SBH11-PBPC-D08-ST-BK,SBH11-PBPC-D08-ST-BK,CONN16_SBH11-PBPC-D08-ST-BK_SU,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,SBH11-PBPC-D08-ST-BK,Sullins,,,,,,"Headers, Male Pins",
+U5,MAX4062EUB+,MAX4062EUB+,21-0061L,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,MAX4062EUB+,Analog Devices Inc,,,,,,,
+U4,CMA-4544PF-W,CMA-4544PF-W,CMA_CUI_9P7X9P7_CUD,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,CMA-4544PF-W,CUI Devices,,,,,,,
+U6,USB-AP2151DWG-7,USB-AP2151DWG-7,SOT25_DIO,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,AP2151DWG-7,Diodes Inc,,,,,,,
+U2,74LVC4245APW,74LVC4245APW,SOT355-1_NEX,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,74LVC4245APW,Nexperia,,,,,,,
+U1,74LVC4245APW,74LVC4245APW,SOT355-1_NEX,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,74LVC4245APW,Nexperia,,,,,,,
+J_MIC,54-00174,54-00174,54-00174_TEN,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,54-00174,Tensility,,,,,,,
+J2,USB-61400416021,USB-61400416021,CONN4_416021_WRE,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,61400416021,Wurth Electronics,,,,,,,
+P2,,2X18-(INCH)-0.1-TH-(35MIL-DIA)-W/O-SILK,TH-2X18-(35MIL-DIA)-W/O-SILK,,,,61303621121,Wurth Electronics,61303621121,,,,,,
+P1,,2X18-(INCH)-0.1-TH-(35MIL-DIA)-W/O-SILK,TH-2X18-(35MIL-DIA)-W/O-SILK,,,,61303621121,Wurth Electronics,61303621121,,,,,,
+J3,1935161,1935161,CONN_1935161_PXC,,Copyright (C) 2023 Ultra Librarian. All rights reserved.,,1935161,Phoenix Contact,,,,,,,
+RG,11k,R-0805,R0805,"Resistor, Surface Mount",,Panasonic,ERJ-6ENF1102V,,,,,5%,,,
+R4,10k,R-0805,R0805,"Resistor, Surface Mount",,Panasonic,ERJ-P06J103V,,,,,5%,,,
+R2,2.2k,R-0805,R0805,"Resistor, Surface Mount",,Panasonic,ERJ-6ENF2201V,,,,,5%,,,
+R1,2.2k,R-0805,R0805,"Resistor, Surface Mount",,Panasonic,ERJ-6ENF2201V,,,,,5%,,,
+FB2,,FB-(INCH)-0603,603,,,,LI0603G121R-10,,,,,,,,
+FB1,,FB-(INCH)-0603,603,,,,LI0603G121R-10,,,,,,,,
+C9,.1uF,C-0603,C0603,"Capacitor, Surface Mount",,Kemet,C0603C104K8RAC7867,,,,X7R,10%,,,6.3V
+C8,"100uF, 6.3V",C-1206,C1206,"Capacitor, Surface Mount",,Kemet,C1206C107M9PAC7210,,,,X7R,10%,,,6.3V
+C7,".1uF, 6.3V",C-0603,C0603,"Capacitor, Surface Mount",,Kemet,C0603C104K8RAC7867,,,,X7R,10%,,,6.3V
+C6,"10uF, 6.3V",C-0603,C0603,"Capacitor, Surface Mount",,Kemet,C0603C106M9PAC7867,,,,X7R,10%,,,6.3V
+C5,.1u,C-0805,C0805,"Capacitor, Surface Mount",,Kemet,C0805C104K8RAC7800,,,,X7R,10%,,,6.3V
+C4,".1uF, 6.3V",C-0603,C0603,"Capacitor, Surface Mount",,Kemet,C0603C104K8RAC7867,,,,X7R,10%,,,6.3V
+C3,.1u,C-0805,C0805,"Capacitor, Surface Mount",,Kemet,C0805C104K8RAC7800,,,,X7R,10%,,,6.3V
+C2,.1u,C-0805,C0805,"Capacitor, Surface Mount",,Kemet,C0805C104K8RAC7800,,,,X7R,10%,,,6.3V
+C1,.1u,C-0805,C0805,"Capacitor, Surface Mount",,Kemet,C0805C104K8RAC7800,,,,X7R,10%,,,6.3V
