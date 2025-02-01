@@ -4,6 +4,11 @@
 #  for and audio signal / buffer of samples. 
 # Includes filtering, noise suppression, frequency binning, FFT itself etc. Mostly with numpy calls
 
+# Reese Grimsley 2025, MIT license
+# Purpose is processing functions for audio signals to get a log-power and log-frequency vector
+#  for and audio signal / buffer of samples. 
+# Includes filtering, noise suppression, frequency binning, FFT itself etc. Mostly with numpy calls
+
 import wave
 import os, sys, time
 import struct
@@ -14,6 +19,7 @@ import pb_audio.generate_matrix_image as generate_matrix_image
 
 
 def read_samples(wave_file, num_samples):
+    
     
     sample_bytes = wave_file.readframes(num_samples)
     samples_np = np.frombuffer(sample_bytes, dtype='<h')
@@ -168,7 +174,6 @@ def mask_band(non_log_power, freq, HZ_TARGET=60):
     bin = -1
     for i, f in enumerate(freq):
         if f < HZ_TARGET and freq[i+1] >= HZ_TARGET:
-            # actually frequency of interest isn't going to be exactly in here, find the closest one
             bin = i
             break
 
