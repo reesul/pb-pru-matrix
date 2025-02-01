@@ -1,4 +1,13 @@
 #!/usr/bin/python3
+# Reese Grimsley 2025, MIT license
+
+# Signal and transfer data to the PRU
+# This is done entirely with /dev/mem. RPMsg is a good alternative, but needed data to
+#   be shared through shared memory/DDR anyway, so I figured cut out the signalling and
+#   let the PRU rely on its fairly loop to just check for differences in the data
+#   That difference is based on an md5sum so PRU knows when to update the local image. 
+# PRU has background update and working copy. This script modifies the background update image 
+# Most of this file is actually test/benchmarking code
 
 from time import sleep, time
 import math
@@ -11,15 +20,18 @@ import pb_audio.constants as const
 
 MD5SUM_SIZE = 16
 
+# address of PRU in memory map
 PRU_ADDR = 0x4A300000
+# SRAM shared between both PRUs
 PRU_SHAREDMEM  = 0x10000
 PRU_SHAREDMEM_SIZE = 12000
 
 PRU_SHARED_MEM_HASH_LOC = PRU_ADDR + PRU_SHAREDMEM
 PRU_SHARED_MEM_IMAGE_LOC = PRU_ADDR + PRU_SHAREDMEM + MD5SUM_SIZE
-EXTRA_OFFSET = 0
+EXTRA_OFFSET = 0 #testing artifact
 IMAGE_OFFSET = MD5SUM_SIZE + EXTRA_OFFSET
 
+#target currently only used for testing... TODO?
 FPS_TARGET=30 # 24 #30 # 60
 INTERFRAME_LATENCY = 1/FPS_TARGET
 
@@ -34,12 +46,11 @@ def read_test_image_file(filepath='Test_card.png'):
     image = cv2.imread(filepath)
     print('read image at %s' % filepath)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    image = cv2.flip(image, 0)
+
     image = image.astype(np.uint8)
-    print(image.shape)
     image = cv2.resize(image, (64,32), interpolation=cv2.INTER_LINEAR)
-    print(image.shape)
-    image = np.transpose(image, (2,0,1))#CHW from HWC
+
+    image = np.transpose(image, (2,0,1))#CHW from HWC, consistent with PRU driver
     
     print(image.shape)
     image = image.copy(order='C')
@@ -57,10 +68,13 @@ def gen_white_image():
 
 def transform_test_image_colorbits(image, cols=64, bits=8):
     '''
-    Each column will have reduced color bits in chunks of 8 cols.
+    Test image generation code
+
+    Each column will have reduced color bits in chunks of 8 cols. This is to check bit-depth
     Leftmost has all bits possible, right most has none
-    Secondf rom left has lower 7 bits enabled. Next is 6, and so on
-    
+    Second rom left has lower 7 bits enabled. Next is 6, and so on
+
+    ugly.. :]
     '''
 
     col_bit_counter = 0
@@ -80,6 +94,8 @@ def transform_test_image_colorbits(image, cols=64, bits=8):
 def shift_image_cols(image, cols=64):
     '''
     image in CHW format
+
+    shift each column over to get some mobility from one frame to the next
     '''
     first_col = image[:,:,0]
     for i in range(cols-1):
@@ -94,10 +110,15 @@ def open_pru_mem():
     print('Open /dev/mem/... requires SUDO')
     fmem = os.open('/dev/mem', os.O_RDWR | os.O_SYNC )
     print('Opened')
+    # memory map /dev/mem, specifcally to the chunk that we need from the PRU
     pru_shared_mem = mmap.mmap(fmem, PRU_SHAREDMEM_SIZE, offset=PRU_ADDR+PRU_SHAREDMEM)
+    
     return pru_shared_mem
 
 def send_image_to_pru(pru_shared_mem, image):
+    '''
+    Send an image to the PRU by generating an MD5 sum and writing both to preordained location
+    '''
 
     md5 = hashlib.md5(image).digest()
 

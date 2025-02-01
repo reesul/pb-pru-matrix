@@ -1,4 +1,10 @@
 #!/usr/bin/python3
+# Reese Grimsley 2025, MIT license
+
+# Main python application for the led matrix - audio spectrogram project. 
+# Captures audio, processes audio, generates an image to visualize frequency spectrum, and sends to PRU
+# PRU will be running a driver to run the LED matrix itself with whatever image arrives
+# PRU is signalled by writing data to shared memory -- nominally mem-mapped PRU SRAM, but could be DDR too..
 
 import time
 from pb_audio import constants as const
@@ -15,23 +21,29 @@ PRINT_PROFILE_FREQ = 40
 
 
 def sliding_window(old_audio, new_audio, output_buf_size=const.PROCESSING_CHUNK_SIZE):
+    '''
+    Best efforts sliding window, we'll keep as much of the old audio as we need to, prioritizing new data
+    '''
     new_len = len(new_audio)
 
     keep_bytes = output_buf_size - new_len
-    old_audio = old_audio[-keep_bytes:]
+    old_audio = old_audio[-keep_bytes:] # take the last set of bytes here; those will be the start of the new buffer
 
     audio = np.concatenate((old_audio,new_audio))
 
     return audio
 
 
-
 def main():
+    '''
+    The glue ;) most of the magic is all the separate functions. Half of this is just profiling code
+    '''
     print('Start Pocketbeagle audio-visualizer')
 
-    baseline_image = generate_matrix_image.baseline_image(const.MAT_SIZE_H, const.MAT_SIZE_W, max_val=255)
+    #v2 approach to generating images; make a good starting point and mask pixels that aren't needed
+    baseline_image = generate_matrix_image.baseline_image(const.MAT_SIZE_H, const.MAT_SIZE_W, max_val=const.IMAGE_MAX_VAL)
     
-    #setup comms to PRU
+    #setup comms to PRU (i.e. open /dev/mem)
     pru_shared_mem = pru_transfer.open_pru_mem()
 
     print("Setup and start audio capture")
@@ -56,17 +68,12 @@ def main():
             t_read_end = time.time()
             audio_buffer_newest = read_audio.format_samples(sample_bytes)
 
-
-
             #combine to produce sliding window
-            # audio_buffer = np.concatenate((audio_buffer_oldest, audio_buffer_newest))
-            # audio_buffer = np.concatenate((audio_buffer_newest, audio_buffer_oldest))
-            # audio_buffer = audio_buffer_newest
             audio_buffer = sliding_window(audio_buffer_oldest, audio_buffer_newest, const.PROCESSING_CHUNK_SIZE)
 
             t_create_buffer = time.time()
             #  process chunk
-            norm_log_fft_bins = process_audio.process_chunk(audio_buffer, chunk_size=audio_buffer.shape[0])
+            norm_log_fft_bins = process_audio.process_chunk(audio_buffer)
 
             # smooth audio
             norm_log_fft_bins = process_audio.spatial_smoothing(norm_log_fft_bins)
@@ -74,18 +81,16 @@ def main():
             t_process_audio = time.time()
 
             #  generate image - follow standard 
-            #TODO: use masked baseline image
-            image = generate_matrix_image.mask_baseline_image(baseline_image, norm_log_fft_bins)
-            # image = generate_matrix_image.generate_spectrogram_image(norm_log_fft_bins, image_shape=[const.MAT_NUM_CHANNEL, const.MAT_SIZE_H, const.MAT_SIZE_W], bin_width=const.BIN_PIXEL_WIDTH)
+            image = generate_matrix_image.mask_baseline_image(baseline_image, norm_log_fft_bins) # v2 approach
+            # image = generate_matrix_image.generate_spectrogram_image(norm_log_fft_bins, image_shape=[const.MAT_NUM_CHANNEL, const.MAT_SIZE_H, const.MAT_SIZE_W], bin_width=const.BIN_PIXEL_WIDTH) # v1 approach
 
             t_gen_image = time.time()
 
-            #  send image
+            #  send image to PRU
             pru_transfer.send_image_to_pru(pru_shared_mem, image)
             t_sent_image = time.time()
 
             #  profiling/benchmarking
-
             if PRINT_PROFILING and iteration % PRINT_PROFILE_FREQ == 0:
                 print('\nProfiling')
                 print('Time to read audio: \t\t%01.3f ms' % (1000*(t_read_end - t_read_start)))
