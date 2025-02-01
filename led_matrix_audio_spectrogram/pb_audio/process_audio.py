@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+# Reese Grimsley 2025, MIT license
+# Purpose is processing functions for audio signals to get a log-power and log-frequency vector
+#  for and audio signal / buffer of samples. 
+# Includes filtering, noise suppression, frequency binning, FFT itself etc. Mostly with numpy calls
+
 import wave
 import os, sys, time
 import struct
@@ -9,21 +14,19 @@ import pb_audio.generate_matrix_image as generate_matrix_image
 
 
 def read_samples(wave_file, num_samples):
+    
     sample_bytes = wave_file.readframes(num_samples)
     samples_np = np.frombuffer(sample_bytes, dtype='<h')
     return samples_np
 
 
 def run_fft_test(wavefile_name='sound1.wav', chunk_size=const.CHUNK_SIZE_BYTES, use_real_fft=True):
+    '''
+    Test out audio-read from file, run some FFTs, and benchmark runtime
+    '''
     with wave.open(wavefile_name, 'rb') as wave_file:
-        # wave_file.setnchannels(1)
-        # 2 bytes per sample.
-        # wave_file.setsampwidth(2)
-        # wave_file.setframerate(SAMPLERATE)
 
         samples = read_samples(wave_file, chunk_size)
-        # samples2 = read_samples(wave_file, chunk_size) #like a sliding window..
-        # samples = np.concatenate((samples1, samples2))
 
         t1 = time.time()
         if use_real_fft:
@@ -36,31 +39,14 @@ def run_fft_test(wavefile_name='sound1.wav', chunk_size=const.CHUNK_SIZE_BYTES, 
     return t2-t1, freq_domain
 
 
-def run_fft_rfft_test(wavefile_name='sound1.wav', chunk_size=const.CHUNK_SIZE_BYTES):
-    with wave.open(wavefile_name, 'rb') as wave_file:
-
-
-        samples = read_samples(wave_file, chunk_size)
-
-        t1 = time.time()
-        freq_domain = np.fft.fft(samples)
-        t2 = time.time()
-        print(freq_domain.shape)
-        rfreq_domain = np.fft.rfft(samples)
-        print(rfreq_domain.shape)
-
-        print(f'{t2-t1} seconds to run FFT on {samples.shape[0]} points')
-        power = np.abs(freq_domain)**2
-        r_power = np.abs(rfreq_domain)**2
-
-        diff = power[0:len(r_power)] - r_power
-
-    return freq_domain, rfreq_domain
-
 def get_real_fourier_power(chunk, eps=1e-8):
+    '''
+    Real signal, so take real FFT and convert to dB by power
+    '''
     freq_domain = np.fft.rfft(chunk)
     power = np.abs(freq_domain)**2
     power_db = 10 * np.log10(power + eps)
+
     return power_db
 
 
@@ -71,18 +57,28 @@ def pull_one_chunk_from_file(wavefile_name='sound1.wav', chunk_size=const.CHUNK_
 
 def pull_all_chunks_from_file(wavefile_name='sound1.wav', chunk_size=const.CHUNK_SIZE_BYTES):
     audio_chunks = []
-    i=0
+
     print('pull audio chunks...')
     with wave.open(wavefile_name, 'rb') as wave_file:
+
         while True:
+
             chunk = read_samples(wave_file, chunk_size)
-            if len(chunk) < chunk_size:
-                break
             audio_chunks.append(chunk)
-            i += 1
+
+            if len(chunk) < chunk_size:
+                #probably better ways to check this, like EOF..
+                break
+            
+
     return audio_chunks
 
+
 def benchmark_fft():
+    '''
+    Try a bunch of FFT sizes and see how long it takes
+    Will help dicatate upper limit on CPU speed relative to sample rate/buffer duration
+    '''
     buf_sizes = [128, 256, 512, 1024, 2048, 4096]
     for bs in buf_sizes:
         chunk_s = bs
@@ -94,8 +90,8 @@ def benchmark_fft():
         print(' %0.3f ms to run FFT on %d points or %0.1f ms of audio' % (total_latency/num_tests*1000, chunk_s, chunk_s/SAMPLERATE*1000))
 
 
-
 def get_frequencies(num_points, sample_rate):
+
     ind = np.asarray(range((num_points // 2) + 1))
     frequencies = sample_rate * ind / num_points 
 
@@ -104,16 +100,24 @@ def get_frequencies(num_points, sample_rate):
 
     return frequencies
 
+
 def rebin_logarithmic(power_spectrum, freq, num_bins=const.NUM_OUTPUT_BINS, log_base=2, min_freq=const.FREQ_MIN, max_freq=const.FREQ_MAX): 
     """ 
     Re-bin the power spectrum into a specified number of logarithmically spaced bins 
-        provided by copilot...  
+    
+    Did an experiment and started from copilot written algo, but it worked poorly and had some functional error
+    This algo is a bit hacky, mainly when trying to map a new set of frequency bins that are logarithmically increasing
+    -- Don't honestly understand well what I did, but new bins work well. Worth investigating in the future to check for skipped/under utilized frequencies
+    -- I tried to make sure low bins (20, 30.. 100) each had their own value. From default settings, original FFT has ~9.7 Hz spacing
 
     Algo:
-        trim frequency/power spectrum to min / max frequencies
+        trim frequency/power spectrum to min / max frequencies (default 18 <-> SR/2 --> SR was 20kS/s
         generate a set of bins over which to average power spectrum -- use log as basis
             - also ensure that no frequency bins are being ignored or rejected.. somewhat hard
         rebin power according to bin indices -- average power within joined frequency bins
+
+
+    Returns the rebinned log-power spectrum and the indices of the trimmed signal used for each new bin (averaged across log-power between those indices) 
     """ 
           
     #filter to min and max frequencies
@@ -131,34 +135,40 @@ def rebin_logarithmic(power_spectrum, freq, num_bins=const.NUM_OUTPUT_BINS, log_
     # print(new_bins)
     # print(new_bins[0:10])
 
+    #init
     rebin_power = np.zeros(num_bins) 
 
     start = end = 0
+    # save the frequency bins that were used per bin
     bin_inds = np.zeros((num_bins,2))
     for i in range(0, num_bins): 
         start = max(int(new_bins[i]), end) 
         end = int(new_bins[i+1]) 
         if start >= end: 
-            #means we've gotten ahead of the bin indices, which is likely at low frequencies
+            #means we've gotten ahead of the bin indices, which is likely at low frequencies. Give that frequency its own bin
             end = start+1
+            #this may lead to the middle/upper having a poor mapping relative to low frequencies
 
-        if i<8:
-            # print(freq[start:end] )
-            pass
         rebin_power[i] = np.mean(power_spectrum[start:end]) 
         bin_inds[i,:] = [start, end]
 
         # print(rebin_power[i])
 
+    return rebin_power, bin_inds, freq
 
-    return rebin_power, bin_inds
 
 def mask_band(non_log_power, freq, HZ_TARGET=60):
-
+    '''
+    Try to mask a particular frequency band (still original linear frequencies) around a particular frequency target. 
+    Mainly used to mask out some noise from power line / ground loop around 60 Hz (and maybe harmonics)    
+    
+    NOT optimized
+    '''
     ind_lower = ind_higher = 0
     bin = -1
     for i, f in enumerate(freq):
-        if f < HZ_TARGET and freq[i+1] > HZ_TARGET:
+        if f < HZ_TARGET and freq[i+1] => HZ_TARGET:
+            # actually frequency of interest isn't going to be exactly in here, find the closest one
             bin = i
             break
 
@@ -167,27 +177,34 @@ def mask_band(non_log_power, freq, HZ_TARGET=60):
 
 
 def normalize_fft(fft_bins, MINIMUM_MAX=const.MIN_MAX_DB):
+    '''
+    Normalize the FFT bins, nominally on the post-processed, log-frequency 
+    so less change of specific high frequencies running the scaling
+    '''
     mm = np.min(fft_bins)
     MM = np.max(fft_bins)
-    MM = max(MINIMUM_MAX, MM)
+    MM = max(MINIMUM_MAX, MM) # another upper limit to give more continuity between frames
 
     normalized = (fft_bins - mm) / (MM- mm)
     return normalized
 
-def process_chunk(samples, chunk_size=const.BUF_SIZE_SAMPLES):
+
+def process_chunk(samples):
+    '''
+    Primary audio processing function, for some chunk of audio
+    '''
 
     freq = get_frequencies(len(samples), const.SAMPLERATE)
 
     power_db = get_real_fourier_power(samples)
 
+    # Have a nasty 60 Hz noise on all audio signal, so try to mask this (and 2nd harmonic)
     power_db = mask_band(power_db, freq, HZ_TARGET=60)
     power_db = mask_band(power_db, freq, HZ_TARGET=120)
 
-    # power_db[0] = np.min(power_db)
 
-    log_power_bins, new_bin_indices = rebin_logarithmic(power_db, freq, min_freq=const.FREQ_MIN, max_freq=const.FREQ_MAX)
-    # freq_bins = freq[new_bin_indices] #incorrect code, probably needs lambda func
-    # log_power_bins[0] = np.min(log_power_bins)
+    log_power_bins, new_bin_indices, log_freq = rebin_logarithmic(power_db, freq, min_freq=const.FREQ_MIN, max_freq=const.FREQ_MAX)
+    # Not a mathmatically pure log-frequency mapping, but good enough
 
     normalized_log_fft_bins = normalize_fft(log_power_bins, MINIMUM_MAX=const.MIN_MAX_DB)
 
@@ -196,21 +213,27 @@ def process_chunk(samples, chunk_size=const.BUF_SIZE_SAMPLES):
 
 from scipy.ndimage import gaussian_filter
 def spatial_smoothing(power_spectrum):
-    #try other types of filters. Want something a bit sharper
-    filtered_specrogram = power_spectrum
+    '''
+    Smoothing between adjacent frequencies
+    '''
     
     if const.BIN_PIXEL_WIDTH == 2:
        filtered_specrogram = gaussian_filter(power_spectrum, sigma=0.75, truncate=3, mode='constant')
     elif const.BIN_PIXEL_WIDTH == 1:
         filtered_specrogram = gaussian_filter(power_spectrum, sigma=1.4, truncate=2, mode='constant')
+    else:
+        filtered_specrogram = power_spectrum
 
 
     return filtered_specrogram
 
 def temporal_smoothing(power_spectrum):
-    
-    
-    # 0 to 1, with 1 being only current value and 0 being only most recent
+    '''
+    Temporal filter to smooth jittery look. 
+    Current implementation is 1-tap IIR / alpha-filter. This could be improved quite a bit..
+
+    Uses static variable/state attached to this function and initialized on first run
+    '''
     alpha = 0.65 
     if temporal_smoothing.last_power_spectrum is None:
         temporal_smoothing.last_power_spectrum = power_spectrum
@@ -241,8 +264,6 @@ def _test_on_image_file(filename='sound_song_endlessly_noisy.wav', buf_size=cons
         output_filename = 'output_images/matrix_image_%05d.png' % i
         cv2.imwrite(output_filename, image)
 
-    # benchmark_fft()
-    # freq_domain, rfreq_domain = run_fft_rfft_test(chunk_size=buf_size)
 
 
 if __name__ == '__main__':

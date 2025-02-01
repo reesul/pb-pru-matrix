@@ -1,3 +1,4 @@
+# Reese Grimsley 2025, MIT license
 
 DEV_ADC_FILEPATH = '/dev/iio:device0'
 BUF_SIZE_SAMPLES = 768 #best depends on sample rate and process+image gen latency. ~768 for 30ms/buf

@@ -1,35 +1,56 @@
 #!/usr/bin/python3
+# Reese Grimsley 2025, MIT license
+
 import wave
 import os, sys, time
 import pb_audio.constants as const
 import numpy as np
 
 TEST_DURATION = 35.0 #seconds
-SAMPLERATE = 40000 #calc sampling rate from ADC DTS config#8192 #guess?
-FLUSH_ITERATIONS=10
+SAMPLERATE = 40000 #calc sampling rate from ADC DTS config
+FLUSH_ITERATIONS=10 #collect buffers to dump data out of ADC queue
+## buffer size will be from const.CHUNK_SIZE_BYTES
 
 def write_to_wav(buffer, filename="sound1.wav"):
+    '''
+    Write buffer of audio data to file and test audibility, quality
+    '''
     with wave.open(filename, "wb") as f:
         # 1 Channel.
         f.setnchannels(1)
-        # 2 bytes per sample.
+        # 2 bytes per sample for 12-bit ADC
         f.setsampwidth(2)
         f.setframerate(const.SAMPLERATE)
         f.writeframes(buffer)
 
 def read_buf(dev_file, chunk_size):
+    '''
+    read buffer of data from /dev/ audio iface
+    '''
     buf = dev_file.read(chunk_size) #flush
     return buf
 
 def read_all_available_bytes(dev_file):
+    '''
+    flush the whole file... probably useless function on /dev
+    '''
     return dev_file.read()
 
 def format_samples(sample_bytes):
+    '''
+    Convert data in from byte buffer to sample buffer 
+    little endian int16
+    '''
     samples_np = np.frombuffer(sample_bytes, dtype='<h')
     return samples_np
     
 
-def open_audio(adc_dev_filename=const.DEV_ADC_FILEPATH):
+def open_audio(adc_dev_filename=const.DEV_ADC_FILEPATH, flush_iter=FLUSH_ITERATIONS):
+    '''
+    Open ADC to read audio samples from /dev interface
+
+    Read buffers based on const.CHUNK_SIZE_BYTES, and may flush out N buffers upon opening to 'clear the queue'
+    '''
     dev_file = None
     print('opening audio')
     try:
@@ -68,6 +89,10 @@ def _test_main():
     write_to_wav(buffer)
 
 def read_speed_test():
+    '''
+    How fast can we read data through /dev/? 
+    Depends on sample rate set from DTS
+    '''
     dev_file = open_audio(const.DEV_ADC_FILEPATH)
 
     for i in range(100):
