@@ -1,6 +1,6 @@
 
 DEV_ADC_FILEPATH = '/dev/iio:device0'
-BUF_SIZE_SAMPLES = 512 #1024 to 2048 are most acceptable. Pref power of 2
+BUF_SIZE_SAMPLES = 768 #best depends on sample rate and process+image gen latency. ~768 for 30ms/buf
 BYTES_PER_SAMPLE = 2 #uint16 containers
 CHUNK_SIZE_BYTES = BUF_SIZE_SAMPLES * BYTES_PER_SAMPLE
 PROCESSING_CHUNK_SIZE = 1024
