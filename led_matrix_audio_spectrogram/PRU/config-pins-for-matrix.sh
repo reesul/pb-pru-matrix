@@ -1,7 +1,8 @@
 #!/bin/bash
 
-
+#GPIO pins for signalling output-enable, latch, A,B,C,D 
 gpiopins="P2.02 P2.04 P2.06 P2.08 P2.20 P2.22"
+#PRU pins for faster signals, i.e. data bits and clock
 prupins="P2.28 P1.33 P1.31 P1.29 P2.30 P2.32 P2.34"
 
 for pin in $prupins

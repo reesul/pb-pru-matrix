@@ -83,7 +83,7 @@ def color_bin_quadrant(bin, color, bin_value, quadrant_bottom, quadrant_top):
 
 
 import cv2 #slow, may try pickleizing baseline image? 
-def baseline_image(height,width, max_val=255, invert_map=True, norm_factor=const.IMAGE_NORM_FACTOR):
+def baseline_image(height,width, max_val=const.MAX_UINT8, invert_map=True, clip_val=const.IMAGE_MAX_VAL):
     '''
     Generate the background image
     Each column will look the same -- a gradient per opencv colormap
@@ -99,10 +99,9 @@ def baseline_image(height,width, max_val=255, invert_map=True, norm_factor=const
     #HOT (INV), JET (meh, no INV), RAINBOW (INV), HSV (INV or no INV)
     img = cv2.applyColorMap(grey_img, cv2.COLORMAP_HSV)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) #default is BGR in opencv2... dummies
-
     
     img = np.transpose(img, (2,0,1))#CHW from HWC -- consistent with PRU LED-matrix driver
-    img = (img / norm_factor).astype(np.uint8) # normalize to decrease overall brightness; based on const
+    img = np.clip(img, a_min=0, a_max=clip_val) # normalize to decrease overall brightness; based on const
     img = img.copy(order='C') # To convert img to byte-buffer, needs C-ordering
 
     return img

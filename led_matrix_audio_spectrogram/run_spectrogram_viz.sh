@@ -7,8 +7,14 @@ echo "setup audio cap"
 
 echo "make and run matrix-PRU code"
 cd PRU
-./make_and_run.sh
+source ./make_and_run.sh
+PRU_SUCCESS=$?
 cd ..
 
-echo "Start actual python app"
-python3 main.py
+if [ $PRU_SUCCESS -ge "0" ] 
+then
+    echo "Start actual python app"
+    python3 main.py
+else
+    echo "failed to setup PRU driver; not starting python"
+fi

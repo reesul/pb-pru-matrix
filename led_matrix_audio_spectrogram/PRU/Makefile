@@ -5,7 +5,10 @@
 #
 # *ARM Linux also needs to create a symbolic link to the /usr/bin/ directory in
 # order to use the same Makefile
+
 #(ARM Linux) ln -s /usr/bin/ /usr/share/ti/cgt-pru/bin
+## Pulled form existing PRU projects; unmodified by RG
+## Notice some problems with using multiple source files, so just one main.c worked best
 
 PRU_CGT=/usr/share/ti/cgt-pru
 PRU_SS_LIB=/usr/lib/ti/pru-software-support-package

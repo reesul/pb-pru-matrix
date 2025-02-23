@@ -31,6 +31,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+ /*
+	Generally unmodified by me (RG); rpmsg not actually in use
+ */
+
 #ifndef _RSC_TABLE_PRU_H_
 #define _RSC_TABLE_PRU_H_
 

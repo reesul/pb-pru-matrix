@@ -1,5 +1,6 @@
 #warning "Found am335x"
 
+//Memory map registers for GPIO banks
 #define GPIO0 0x44E07000        // From table 2.2 of am335x TRM
 #define GPIO1 0x4804C000
 #define GPIO2 0x481AC000
